@@ -1,0 +1,24 @@
+@keyframes fadeSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.site-title {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.5rem, 5vw, 2rem); /* responsivo */
+  color: white;
+  text-decoration: none;
+  animation: fadeSlideDown 1.5s ease-out forwards;
+  transition: transform 0.3s ease;
+}
+
+.site-title:hover {
+  transform: translateY(-2px); /* efeito sutil ao passar o mouse */
+}
