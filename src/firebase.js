@@ -19,18 +19,19 @@ import {
   doc,
   getDoc,
   updateDoc,    // <-- ADICIONADO
-  deleteDoc     // <-- ADICIONADO
+  deleteDoc,    // <-- ADICIONADO
+  increment     // <-- ADICIONADO para contador de visualizações
 } from 'firebase/firestore';
 
-// Configuração real do Firebase
+// Configuração do Firebase usando variáveis de ambiente
 const firebaseConfig = {
-  apiKey: "AIzaSyBd5JxwMOKaiLmqp2uskD6tq3_2CNB_NMU",
-  authDomain: "simplificacifras-13a59.firebaseapp.com",
-  projectId: "simplificacifras-13a59",
-  storageBucket: "simplificacifras-13a59.appspot.com",
-  messagingSenderId: "667304019744",
-  appId: "1:667304019744:web:0e1d23e1c8837c63d9b945",
-  measurementId: "G-30FPREH956"
+  apiKey: import.meta.env.VITE_API_KEY,
+  authDomain: import.meta.env.VITE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_APP_ID,
+  measurementId: import.meta.env.VITE_MEASUREMENT_ID
 };
 
 // Inicializa Firebase
@@ -67,6 +68,7 @@ export {
   serverTimestamp,
   doc,
   getDoc,
-  updateDoc,     // <-- exportado para editar cifras
-  deleteDoc      // <-- exportado para deletar cifras
+  updateDoc,
+  deleteDoc,
+  increment  // <-- exportado para contador de visualizações
 };

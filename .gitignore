@@ -28,3 +28,4 @@ dist-ssr
 
 # Arquivos sensíveis
 firebase.js
+.env 

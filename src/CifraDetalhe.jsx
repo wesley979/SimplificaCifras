@@ -1,6 +1,7 @@
+// src/CifraDetalhe.jsx
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { db, doc, getDoc } from './firebase';
+import { db, doc, getDoc, updateDoc, increment } from './firebase';
 import { useAuth } from './hooks/useAuth';
 
 export default function CifraDetalhe({ onDelete }) {
@@ -9,6 +10,7 @@ export default function CifraDetalhe({ onDelete }) {
   const { user, isMaster, loading: authLoading } = useAuth();
 
   const [cifra, setCifra] = useState(null);
+  const [views, setViews] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [deleting, setDeleting] = useState(false);
@@ -20,8 +22,19 @@ export default function CifraDetalhe({ onDelete }) {
       try {
         const docRef = doc(db, 'cifras', id);
         const docSnap = await getDoc(docRef);
+
         if (docSnap.exists()) {
-          setCifra({ id: docSnap.id, ...docSnap.data() });
+          const data = docSnap.data();
+          setCifra({ id: docSnap.id, ...data });
+          setViews(data.views || 0);
+
+          // Tenta incrementar views após carregar
+          try {
+            await updateDoc(docRef, { views: increment(1) });
+            setViews((prev) => prev + 1);
+          } catch (err) {
+            console.error('Erro ao atualizar views:', err.message);
+          }
         } else {
           setError('Cifra não encontrada.');
         }
@@ -54,6 +67,7 @@ export default function CifraDetalhe({ onDelete }) {
   };
 
   if (loading || authLoading) return <p>Carregando...</p>;
+
   if (error)
     return (
       <div style={{ padding: '1rem', textAlign: 'center' }}>
@@ -65,20 +79,41 @@ export default function CifraDetalhe({ onDelete }) {
     );
 
   return (
-    <section style={{ padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <section
+      style={{
+        padding: '1rem',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        position: 'relative',
+      }}
+    >
+      {/* Contador de visualizações */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 10,
+          right: 10,
+          fontWeight: 'bold',
+        }}
+      >
+        Visualizações: {views}
+      </div>
+
       <h2 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-        {cifra?.musica ?? 'Música não informada'} - {cifra?.artista ?? 'Artista não informado'}
+        {cifra?.musica ?? 'Música não informada'} -{' '}
+        {cifra?.artista ?? 'Artista não informado'}
       </h2>
 
       <pre
         style={{
-          backgroundColor: '#e8e8e8', // cinza leve
+          backgroundColor: '#e8e8e8',
           color: '#222',
           padding: '1.5rem',
           borderRadius: '8px',
           whiteSpace: 'pre-wrap',
           fontFamily: 'monospace',
-          fontSize: 'clamp(1rem, 1.1vw, 1.2rem)', // responsiva
+          fontSize: 'clamp(1rem, 1.1vw, 1.2rem)',
           maxWidth: '700px',
           width: '100%',
           textAlign: 'left',
@@ -88,7 +123,6 @@ export default function CifraDetalhe({ onDelete }) {
         {cifra?.cifra ?? 'Cifra não disponível.'}
       </pre>
 
-      {/* Somente master vê os botões */}
       {isMaster && (
         <div style={{ marginTop: '1.5rem' }}>
           <button onClick={handleEditar} style={{ marginRight: '1rem' }}>

@@ -1,3 +1,4 @@
+// src/AddCifra.jsx
 import React, { useState, useEffect } from 'react';
 import { useAuth } from './hooks/useAuth';
 import { 
@@ -25,13 +26,14 @@ export default function AddCifra({ setCifras, cifras }) {
   const [loading, setLoading] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
 
-  // Redireciona se não tiver logado ou não for master
+  // Redireciona se não estiver logado ou não for master
   useEffect(() => {
     if (!user || !isMaster) {
       navigate('/');
     }
   }, [user, isMaster, navigate]);
 
+  // Preenche campos caso seja edição
   useEffect(() => {
     if (location.state?.cifra) {
       const c = location.state.cifra;
@@ -107,6 +109,7 @@ export default function AddCifra({ setCifras, cifras }) {
           cifra,
           genero,
           userId: user.uid,
+          views: 0, // inicializa contador de visualizações
           createdAt: serverTimestamp(),
         };
         const docRef = await addDoc(collection(db, 'cifras'), novaCifra);
@@ -139,14 +142,7 @@ export default function AddCifra({ setCifras, cifras }) {
             value={musica}
             onChange={(e) => setMusica(e.target.value)}
             disabled={loading}
-            style={{
-              width: '100%',
-              padding: '0.8rem',
-              fontSize: '1rem',
-              borderRadius: '6px',
-              border: '1px solid #ccc',
-              marginTop: '0.3rem'
-            }}
+            style={{ width: '100%', padding: '0.8rem', fontSize: '1rem', borderRadius: '6px', border: '1px solid #ccc', marginTop: '0.3rem' }}
           />
         </div>
 
@@ -157,14 +153,7 @@ export default function AddCifra({ setCifras, cifras }) {
             value={artista}
             onChange={(e) => setArtista(e.target.value)}
             disabled={loading}
-            style={{
-              width: '100%',
-              padding: '0.8rem',
-              fontSize: '1rem',
-              borderRadius: '6px',
-              border: '1px solid #ccc',
-              marginTop: '0.3rem'
-            }}
+            style={{ width: '100%', padding: '0.8rem', fontSize: '1rem', borderRadius: '6px', border: '1px solid #ccc', marginTop: '0.3rem' }}
           />
         </div>
 
@@ -175,16 +164,7 @@ export default function AddCifra({ setCifras, cifras }) {
             onChange={(e) => setCifra(e.target.value)}
             rows={15}
             disabled={loading}
-            style={{
-              width: '100%',
-              padding: '1rem',
-              fontSize: '1.2rem',
-              fontFamily: 'Courier New, monospace',
-              borderRadius: '6px',
-              border: '1px solid #ccc',
-              marginTop: '0.3rem',
-              resize: 'vertical'
-            }}
+            style={{ width: '100%', padding: '1rem', fontSize: '1.2rem', fontFamily: 'Courier New, monospace', borderRadius: '6px', border: '1px solid #ccc', marginTop: '0.3rem', resize: 'vertical' }}
           />
         </div>
 
@@ -195,30 +175,14 @@ export default function AddCifra({ setCifras, cifras }) {
             value={genero}
             onChange={(e) => setGenero(e.target.value)}
             disabled={loading}
-            style={{
-              width: '100%',
-              padding: '0.8rem',
-              fontSize: '1rem',
-              borderRadius: '6px',
-              border: '1px solid #ccc',
-              marginTop: '0.3rem'
-            }}
+            style={{ width: '100%', padding: '0.8rem', fontSize: '1rem', borderRadius: '6px', border: '1px solid #ccc', marginTop: '0.3rem' }}
           />
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          style={{
-            padding: '1rem',
-            fontSize: '1.1rem',
-            borderRadius: '6px',
-            border: 'none',
-            backgroundColor: '#007acc',
-            color: 'white',
-            cursor: 'pointer',
-            fontWeight: 'bold'
-          }}
+          style={{ padding: '1rem', fontSize: '1.1rem', borderRadius: '6px', border: 'none', backgroundColor: '#007acc', color: 'white', cursor: 'pointer', fontWeight: 'bold' }}
         >
           {loading ? (isEditMode ? 'Salvando...' : 'Cadastrando...') : (isEditMode ? 'Salvar' : 'Cadastrar')}
         </button>
