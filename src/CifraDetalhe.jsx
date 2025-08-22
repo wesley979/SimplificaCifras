@@ -93,6 +93,7 @@ export default function CifraDetalhe({ onDelete }) {
     <section
       style={{
         padding: '1rem',
+        paddingBottom: '5rem', // aumenta espaço inferior para o contador no mobile
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -151,7 +152,12 @@ export default function CifraDetalhe({ onDelete }) {
 
       <Link
         to="/"
-        style={{ display: 'inline-block', marginTop: '2rem', color: '#007acc' }}
+        style={{
+          display: 'inline-block',
+          marginTop: '2rem',
+          color: '#007acc',
+          zIndex: 1, // garante que fique acima do background
+        }}
       >
         ← Voltar para Home
       </Link>
