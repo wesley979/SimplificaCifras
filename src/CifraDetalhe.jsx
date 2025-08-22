@@ -15,6 +15,18 @@ export default function CifraDetalhe({ onDelete }) {
   const [error, setError] = useState('');
   const [deleting, setDeleting] = useState(false);
 
+  // State para controlar posição do contador conforme tamanho da tela
+  const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 600);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobileView(window.innerWidth <= 600);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   useEffect(() => {
     const fetchCifra = async () => {
       setLoading(true);
@@ -28,7 +40,6 @@ export default function CifraDetalhe({ onDelete }) {
           setCifra({ id: docSnap.id, ...data });
           setViews(data.views || 0);
 
-          // Tenta incrementar views após carregar
           try {
             await updateDoc(docRef, { views: increment(1) });
             setViews((prev) => prev + 1);
@@ -86,15 +97,19 @@ export default function CifraDetalhe({ onDelete }) {
         flexDirection: 'column',
         alignItems: 'center',
         position: 'relative',
+        minHeight: '100vh',
       }}
     >
       {/* Contador de visualizações */}
       <div
         style={{
           position: 'absolute',
-          top: 10,
+          top: isMobileView ? 'auto' : 10,
+          bottom: isMobileView ? 10 : 'auto',
           right: 10,
-          fontWeight: 'bold',
+          fontWeight: 'bold',        // mantém negrito
+          fontSize: isMobileView ? '12px' : '16px', // tamanho menor no mobile
+          color: '#000',             // mantém cor
         }}
       >
         Visualizações: {views}
