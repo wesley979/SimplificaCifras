@@ -22,7 +22,6 @@ export default function CifraDetalhe({ onDelete }) {
     const handleResize = () => {
       setIsMobileView(window.innerWidth <= 600);
     };
-
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -55,13 +54,11 @@ export default function CifraDetalhe({ onDelete }) {
         setLoading(false);
       }
     };
-
     fetchCifra();
   }, [id]);
 
   const handleDelete = async () => {
     if (!window.confirm('Tem certeza que deseja excluir esta cifra?')) return;
-
     setDeleting(true);
     try {
       await onDelete(id);
@@ -93,7 +90,7 @@ export default function CifraDetalhe({ onDelete }) {
     <section
       style={{
         padding: '1rem',
-        paddingBottom: '5rem', // aumenta espaço inferior para o contador no mobile
+        paddingBottom: '5rem',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -108,9 +105,9 @@ export default function CifraDetalhe({ onDelete }) {
           top: isMobileView ? 'auto' : 10,
           bottom: isMobileView ? 10 : 'auto',
           right: 10,
-          fontWeight: 'bold',        // mantém negrito
-          fontSize: isMobileView ? '12px' : '16px', // tamanho menor no mobile
-          color: '#000',             // mantém cor
+          fontWeight: 'bold',
+          fontSize: isMobileView ? '12px' : '16px',
+          color: '#000',
         }}
       >
         Visualizações: {views}
@@ -121,19 +118,21 @@ export default function CifraDetalhe({ onDelete }) {
         {cifra?.artista ?? 'Artista não informado'}
       </h2>
 
+      {/* Cifra com scroll horizontal para mobile */}
       <pre
         style={{
-          backgroundColor: '#e8e8e8',
-          color: '#222',
-          padding: '1.5rem',
-          borderRadius: '8px',
-          whiteSpace: 'pre-wrap',
+          overflowX: 'auto',        // permite scroll horizontal no mobile
+          whiteSpace: 'pre',        // mantém todos os espaços e alinhamento
           fontFamily: 'monospace',
           fontSize: 'clamp(1rem, 1.1vw, 1.2rem)',
           maxWidth: '700px',
           width: '100%',
-          textAlign: 'left',
+          padding: '1.5rem',
+          borderRadius: '8px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          textAlign: 'left',
+          backgroundColor: '#e8e8e8',
+          color: '#222',
         }}
       >
         {cifra?.cifra ?? 'Cifra não disponível.'}
@@ -156,7 +155,7 @@ export default function CifraDetalhe({ onDelete }) {
           display: 'inline-block',
           marginTop: '2rem',
           color: '#007acc',
-          zIndex: 1, // garante que fique acima do background
+          zIndex: 1,
         }}
       >
         ← Voltar para Home
