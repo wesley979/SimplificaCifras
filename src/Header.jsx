@@ -40,7 +40,7 @@ const Header = () => {
         className="site-title"
         key={animateKey} // força reinício da animação
       >
-        SimplificaCifras
+        Simplifica Cifras
       </Link>
 
       <nav style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', marginTop: '0.5rem' }}>
