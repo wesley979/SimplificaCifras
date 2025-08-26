@@ -12,6 +12,16 @@ import {
 } from './firebase';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 
+// Função para gerar slug
+function gerarSlug(musica, artista) {
+  return `${musica}-${artista}`
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/[^\w-]/g, '')
+    .toLowerCase();
+}
+
 export default function AddCifra({ setCifras, cifras }) {
   const { user, isMaster } = useAuth();
   const navigate = useNavigate();
@@ -26,14 +36,12 @@ export default function AddCifra({ setCifras, cifras }) {
   const [loading, setLoading] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
 
-  // Redireciona se não estiver logado ou não for master
   useEffect(() => {
     if (!user || !isMaster) {
       navigate('/');
     }
   }, [user, isMaster, navigate]);
 
-  // Preenche campos caso seja edição
   useEffect(() => {
     if (location.state?.cifra) {
       const c = location.state.cifra;
@@ -78,6 +86,7 @@ export default function AddCifra({ setCifras, cifras }) {
     }
 
     setLoading(true);
+    const slug = gerarSlug(musica, artista); // Gerando slug
 
     if (isEditMode) {
       try {
@@ -87,11 +96,12 @@ export default function AddCifra({ setCifras, cifras }) {
           artista,
           cifra,
           genero,
+          slug, // adicionando slug
           updatedAt: serverTimestamp(),
         });
 
         const cifrasAtualizadas = cifras.map(c =>
-          c.id === (id || location.state.cifra.id) ? { ...c, musica, artista, cifra, genero } : c
+          c.id === (id || location.state.cifra.id) ? { ...c, musica, artista, cifra, genero, slug } : c
         );
         setCifras(cifrasAtualizadas);
         setMessage('Cifra atualizada com sucesso!');
@@ -108,8 +118,9 @@ export default function AddCifra({ setCifras, cifras }) {
           artista,
           cifra,
           genero,
+          slug, // adicionando slug
           userId: user.uid,
-          views: 0, // inicializa contador de visualizações
+          views: 0,
           createdAt: serverTimestamp(),
         };
         const docRef = await addDoc(collection(db, 'cifras'), novaCifra);

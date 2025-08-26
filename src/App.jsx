@@ -11,7 +11,7 @@ import CifraDetalhe from './CifraDetalhe';
 
 import { AuthProvider } from './contexts/AuthContext';
 
-import { db, doc, deleteDoc, collection, getDocs } from './firebase';
+import { db, doc, deleteDoc, collection, getDocs, query, where } from './firebase';
 
 import './App.css';
 
@@ -20,29 +20,24 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedTerm, setDebouncedTerm] = useState('');
 
-  // Debounce: atualiza debouncedTerm 300ms depois do usuário parar de digitar
+  // Debounce para a busca
   useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedTerm(searchTerm);
-    }, 300);
-
+    const handler = setTimeout(() => setDebouncedTerm(searchTerm), 300);
     return () => clearTimeout(handler);
   }, [searchTerm]);
 
-  // Carregar cifras do Firestore ao iniciar
+  // Carregar cifras do Firestore
   useEffect(() => {
     async function fetchCifras() {
       const querySnapshot = await getDocs(collection(db, 'cifras'));
       const lista = [];
-      querySnapshot.forEach(docSnap => {
-        lista.push({ id: docSnap.id, ...docSnap.data() });
-      });
+      querySnapshot.forEach(docSnap => lista.push({ id: docSnap.id, ...docSnap.data() }));
       setCifras(lista);
     }
     fetchCifras();
   }, []);
 
-  // Função para deletar cifra do Firestore e atualizar estado
+  // Deletar cifra
   async function handleDelete(id) {
     try {
       await deleteDoc(doc(db, 'cifras', id));
@@ -53,7 +48,7 @@ function App() {
     }
   }
 
-  // Filtrar cifras com base no debouncedTerm (musica ou artista)
+  // Filtrar cifras
   const filteredCifras = cifras.filter(cifra =>
     cifra.musica?.toLowerCase().includes(debouncedTerm.toLowerCase()) ||
     cifra.artista?.toLowerCase().includes(debouncedTerm.toLowerCase())
@@ -64,7 +59,6 @@ function App() {
       <Router>
         <Header />
         <Routes>
-          {/* Página inicial: lista as cifras */}
           <Route
             path="/"
             element={
@@ -75,26 +69,20 @@ function App() {
             }
           />
 
-          {/* Página de detalhe da cifra, com parâmetro id */}
+          {/* Página de detalhe da cifra por ID ou slug */}
           <Route
-            path="/cifras/:id"
+            path="/cifras/:slugOrId"
             element={<CifraDetalhe cifras={cifras} onDelete={handleDelete} />}
           />
 
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* Rota para adicionar nova cifra */}
-          <Route
-            path="/add-cifra"
-            element={<AddCifra setCifras={setCifras} cifras={cifras} />}
-          />
+          {/* Adicionar nova cifra */}
+          <Route path="/add-cifra" element={<AddCifra setCifras={setCifras} cifras={cifras} />} />
 
-          {/* Rota para editar cifra */}
-          <Route
-            path="/edit-cifra/:id"
-            element={<AddCifra setCifras={setCifras} cifras={cifras} />}
-          />
+          {/* Editar cifra */}
+          <Route path="/edit-cifra/:id" element={<AddCifra setCifras={setCifras} cifras={cifras} />} />
         </Routes>
       </Router>
     </AuthProvider>

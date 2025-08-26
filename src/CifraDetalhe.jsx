@@ -1,11 +1,10 @@
-// src/CifraDetalhe.jsx
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { db, doc, getDoc, updateDoc, increment } from './firebase';
+import { db, doc, getDoc, updateDoc, increment, collection, query, where, getDocs } from './firebase';
 import { useAuth } from './hooks/useAuth';
 
 export default function CifraDetalhe({ onDelete }) {
-  const { id } = useParams();
+  const { slugOrId } = useParams();
   const navigate = useNavigate();
   const { user, isMaster, loading: authLoading } = useAuth();
 
@@ -15,13 +14,11 @@ export default function CifraDetalhe({ onDelete }) {
   const [error, setError] = useState('');
   const [deleting, setDeleting] = useState(false);
 
-  // State para controlar posição do contador conforme tamanho da tela
+  // Controla visualizações no mobile
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 600);
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobileView(window.innerWidth <= 600);
-    };
+    const handleResize = () => setIsMobileView(window.innerWidth <= 600);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -30,9 +27,22 @@ export default function CifraDetalhe({ onDelete }) {
     const fetchCifra = async () => {
       setLoading(true);
       setError('');
+
       try {
-        const docRef = doc(db, 'cifras', id);
-        const docSnap = await getDoc(docRef);
+        let docSnap;
+        // Primeiro tenta buscar por ID
+        const docRef = doc(db, 'cifras', slugOrId);
+        docSnap = await getDoc(docRef);
+
+        if (!docSnap.exists()) {
+          // Se não achar, tenta buscar por slug
+          const q = query(collection(db, 'cifras'), where('slug', '==', slugOrId));
+          const querySnapshot = await getDocs(q);
+          if (!querySnapshot.empty) {
+            const docData = querySnapshot.docs[0];
+            docSnap = docData;
+          }
+        }
 
         if (docSnap.exists()) {
           const data = docSnap.data();
@@ -40,8 +50,8 @@ export default function CifraDetalhe({ onDelete }) {
           setViews(data.views || 0);
 
           try {
-            await updateDoc(docRef, { views: increment(1) });
-            setViews((prev) => prev + 1);
+            await updateDoc(doc(db, 'cifras', docSnap.id), { views: increment(1) });
+            setViews(prev => prev + 1);
           } catch (err) {
             console.error('Erro ao atualizar views:', err.message);
           }
@@ -55,13 +65,13 @@ export default function CifraDetalhe({ onDelete }) {
       }
     };
     fetchCifra();
-  }, [id]);
+  }, [slugOrId]);
 
   const handleDelete = async () => {
     if (!window.confirm('Tem certeza que deseja excluir esta cifra?')) return;
     setDeleting(true);
     try {
-      await onDelete(id);
+      await onDelete(cifra.id);
       navigate('/');
     } catch (err) {
       alert('Erro ao deletar cifra: ' + err.message);
@@ -71,7 +81,7 @@ export default function CifraDetalhe({ onDelete }) {
   };
 
   const handleEditar = () => {
-    navigate('/edit-cifra/' + id);
+    navigate('/edit-cifra/' + cifra.id);
   };
 
   if (loading || authLoading) return <p>Carregando...</p>;
@@ -118,11 +128,10 @@ export default function CifraDetalhe({ onDelete }) {
         {cifra?.artista ?? 'Artista não informado'}
       </h2>
 
-      {/* Cifra com scroll horizontal para mobile */}
       <pre
         style={{
-          overflowX: 'auto',        // permite scroll horizontal no mobile
-          whiteSpace: 'pre',        // mantém todos os espaços e alinhamento
+          overflowX: 'auto',
+          whiteSpace: 'pre',
           fontFamily: 'monospace',
           fontSize: 'clamp(1rem, 1.1vw, 1.2rem)',
           maxWidth: '700px',
