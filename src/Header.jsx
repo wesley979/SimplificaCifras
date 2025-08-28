@@ -33,7 +33,6 @@ const Header = () => {
   const toggleMobileMenu = () => {
     setMobileMenuOpen(prev => !prev);
 
-    // Fecha automaticamente após 5 segundos
     if (!mobileMenuOpen) {
       setTimeout(() => setMobileMenuOpen(false), 5000);
     }
@@ -52,63 +51,27 @@ const Header = () => {
         position: 'relative',
       }}
     >
-      {/* Container do título e botão hambúrguer */}
-      <div style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
-        {/* Título */}
-        <Link
-          to="/"
-          className="site-title"
-          key={animateKey}
-          style={{ fontSize: '1.5rem', fontWeight: 'bold' }}
-        >
-          Simplifica Cifras
-        </Link>
+      {/* Título */}
+      <Link
+        to="/"
+        className="site-title"
+        key={animateKey}
+        style={{ fontSize: '1.5rem', fontWeight: 'bold' }}
+      >
+        Simplifica Cifras
+      </Link>
 
-        {/* Botão Hambúrguer (aparece apenas no mobile) */}
-        {isMobile && (
-          <button
-            onClick={toggleMobileMenu}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'white',
-              fontSize: '1.8rem',
-              cursor: 'pointer',
-            }}
-          >
-            ☰
-          </button>
-        )}
-      </div>
-
-      {/* Links e botões */}
-      {(!isMobile || mobileMenuOpen) && (
-        <nav
-          style={{
-            display: 'flex',
-            flexDirection: isMobile ? 'column' : 'row',
-            alignItems: isMobile ? 'flex-start' : 'center',
-            marginTop: isMobile ? '1rem' : 0,
-            width: isMobile ? '100%' : 'auto',
-          }}
-        >
+      {/* Desktop navigation */}
+      {!isMobile && (
+        <nav style={{ display: 'flex', alignItems: 'center' }}>
           {user && (
             <>
-              <span
-                style={{
-                  marginRight: isMobile ? 0 : '1.5rem',
-                  marginBottom: isMobile ? '0.5rem' : 0,
-                }}
-              >
-                Olá, {user.displayName || user.email}
-              </span>
-
+              <span style={{ marginRight: '1.5rem' }}>Olá, {user.displayName || user.email}</span>
               <Link
                 to="/favoritos"
                 style={{
                   color: 'white',
-                  marginRight: isMobile ? 0 : '1.5rem',
-                  marginBottom: isMobile ? '0.5rem' : 0,
+                  marginRight: '1.5rem',
                   textDecoration: 'none',
                   border: '1px solid white',
                   padding: '0.4rem 0.8rem',
@@ -119,13 +82,11 @@ const Header = () => {
               >
                 Favoritos
               </Link>
-
               {isMaster && (
                 <>
                   <span
                     style={{
-                      marginRight: isMobile ? 0 : '1.5rem',
-                      marginBottom: isMobile ? '0.5rem' : 0,
+                      marginRight: '1.5rem',
                       padding: '0.25rem 0.5rem',
                       backgroundColor: '#4caf50',
                       borderRadius: '4px',
@@ -138,8 +99,7 @@ const Header = () => {
                     to="/add-cifra"
                     style={{
                       color: 'white',
-                      marginRight: isMobile ? 0 : '1.5rem',
-                      marginBottom: isMobile ? '0.5rem' : 0,
+                      marginRight: '1.5rem',
                       textDecoration: 'none',
                       border: '1px solid white',
                       padding: '0.4rem 0.8rem',
@@ -165,7 +125,6 @@ const Header = () => {
                 borderRadius: '4px',
                 cursor: 'pointer',
                 fontSize: '1rem',
-                marginTop: isMobile ? '0.5rem' : 0,
               }}
             >
               Sair
@@ -181,13 +140,128 @@ const Header = () => {
                 padding: '0.4rem 0.8rem',
                 borderRadius: '4px',
                 transition: '0.3s',
-                marginTop: isMobile ? '0.5rem' : 0,
               }}
             >
               Login
             </Link>
           )}
         </nav>
+      )}
+
+      {/* Mobile hamburger */}
+      {isMobile && (
+        <>
+          <button
+            onClick={toggleMobileMenu}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'white',
+              fontSize: '1.8rem',
+              cursor: 'pointer',
+            }}
+          >
+            ☰
+          </button>
+
+          {mobileMenuOpen && (
+            <nav
+              style={{
+                position: 'absolute',
+                top: '100%',
+                right: 0,
+                backgroundColor: '#444',
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                padding: '1rem',
+              }}
+            >
+              {user && (
+                <>
+                  <span style={{ marginBottom: '0.5rem' }}>Olá, {user.displayName || user.email}</span>
+                  <Link
+                    to="/favoritos"
+                    style={{
+                      color: 'white',
+                      marginBottom: '0.5rem',
+                      textDecoration: 'none',
+                      border: '1px solid white',
+                      padding: '0.4rem 0.8rem',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontSize: '1rem',
+                    }}
+                  >
+                    Favoritos
+                  </Link>
+                  {isMaster && (
+                    <>
+                      <span
+                        style={{
+                          marginBottom: '0.5rem',
+                          padding: '0.25rem 0.5rem',
+                          backgroundColor: '#4caf50',
+                          borderRadius: '4px',
+                          fontWeight: 'bold',
+                        }}
+                      >
+                        MASTER
+                      </span>
+                      <Link
+                        to="/add-cifra"
+                        style={{
+                          color: 'white',
+                          marginBottom: '0.5rem',
+                          textDecoration: 'none',
+                          border: '1px solid white',
+                          padding: '0.4rem 0.8rem',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Adicionar Cifra
+                      </Link>
+                    </>
+                  )}
+                </>
+              )}
+
+              {user ? (
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    backgroundColor: '#f44336',
+                    color: 'white',
+                    border: 'none',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '1rem',
+                  }}
+                >
+                  Sair
+                </button>
+              ) : (
+                <Link
+                  to="/login"
+                  style={{
+                    color: 'white',
+                    textDecoration: 'none',
+                    fontSize: '1rem',
+                    border: '1px solid white',
+                    padding: '0.4rem 0.8rem',
+                    borderRadius: '4px',
+                    transition: '0.3s',
+                  }}
+                >
+                  Login
+                </Link>
+              )}
+            </nav>
+          )}
+        </>
       )}
     </header>
   );
