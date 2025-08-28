@@ -51,14 +51,16 @@ const Header = () => {
       }}
     >
       {/* Título */}
-      <Link
-        to="/"
-        className="site-title"
-        key={animateKey}
-        style={{ fontSize: '1.5rem', fontWeight: 'bold' }}
-      >
-        Simplifica Cifras
-      </Link>
+      <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+        <Link
+          to="/"
+          className="site-title"
+          key={animateKey}
+          style={{ fontSize: '1.5rem', fontWeight: 'bold', flexShrink: 0 }}
+        >
+          Simplifica Cifras
+        </Link>
+      </div>
 
       {/* Desktop navigation */}
       {!isMobile && (
@@ -155,108 +157,112 @@ const Header = () => {
               color: 'white',
               fontSize: '1.8rem',
               cursor: 'pointer',
+              marginLeft: '1rem',
             }}
           >
             ☰
           </button>
 
-          {mobileMenuOpen && (
-            <nav
-              style={{
-                position: 'absolute',
-                top: '100%',
-                right: 0,
-                backgroundColor: '#444',
-                width: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-                padding: '1rem',
-                zIndex: 1000,
-              }}
-            >
-              {user && (
-                <>
-                  <span style={{ marginBottom: '0.5rem' }}>Olá, {user.displayName || user.email}</span>
-                  <Link
-                    to="/favoritos"
+          <nav
+            style={{
+              position: 'absolute',
+              top: mobileMenuOpen ? '100%' : '-500px',
+              right: 0,
+              width: '100%',
+              backgroundColor: '#444',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+              padding: '1rem',
+              zIndex: 1000,
+              transition: 'top 0.3s ease-in-out',
+            }}
+          >
+            {mobileMenuOpen && (
+              <>
+                {user && (
+                  <>
+                    <span style={{ marginBottom: '0.5rem' }}>Olá, {user.displayName || user.email}</span>
+                    <Link
+                      to="/favoritos"
+                      style={{
+                        color: 'white',
+                        marginBottom: '0.5rem',
+                        textDecoration: 'none',
+                        border: '1px solid white',
+                        padding: '0.4rem 0.8rem',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '1rem',
+                      }}
+                    >
+                      Favoritos
+                    </Link>
+                    {isMaster && (
+                      <>
+                        <span
+                          style={{
+                            marginBottom: '0.5rem',
+                            padding: '0.25rem 0.5rem',
+                            backgroundColor: '#4caf50',
+                            borderRadius: '4px',
+                            fontWeight: 'bold',
+                          }}
+                        >
+                          MASTER
+                        </span>
+                        <Link
+                          to="/add-cifra"
+                          style={{
+                            color: 'white',
+                            marginBottom: '0.5rem',
+                            textDecoration: 'none',
+                            border: '1px solid white',
+                            padding: '0.4rem 0.8rem',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          Adicionar Cifra
+                        </Link>
+                      </>
+                    )}
+                  </>
+                )}
+                {user ? (
+                  <button
+                    onClick={handleLogout}
                     style={{
+                      backgroundColor: '#f44336',
                       color: 'white',
-                      marginBottom: '0.5rem',
-                      textDecoration: 'none',
-                      border: '1px solid white',
-                      padding: '0.4rem 0.8rem',
+                      border: 'none',
+                      padding: '0.5rem 1rem',
                       borderRadius: '4px',
                       cursor: 'pointer',
                       fontSize: '1rem',
                     }}
                   >
-                    Favoritos
+                    Sair
+                  </button>
+                ) : (
+                  <Link
+                    to="/login"
+                    style={{
+                      color: 'white',
+                      textDecoration: 'none',
+                      fontSize: '1rem',
+                      border: '1px solid white',
+                      padding: '0.4rem 0.8rem',
+                      borderRadius: '4px',
+                      transition: '0.3s',
+                    }}
+                  >
+                    Login
                   </Link>
-                  {isMaster && (
-                    <>
-                      <span
-                        style={{
-                          marginBottom: '0.5rem',
-                          padding: '0.25rem 0.5rem',
-                          backgroundColor: '#4caf50',
-                          borderRadius: '4px',
-                          fontWeight: 'bold',
-                        }}
-                      >
-                        MASTER
-                      </span>
-                      <Link
-                        to="/add-cifra"
-                        style={{
-                          color: 'white',
-                          marginBottom: '0.5rem',
-                          textDecoration: 'none',
-                          border: '1px solid white',
-                          padding: '0.4rem 0.8rem',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        Adicionar Cifra
-                      </Link>
-                    </>
-                  )}
-                </>
-              )}
-              {user ? (
-                <button
-                  onClick={handleLogout}
-                  style={{
-                    backgroundColor: '#f44336',
-                    color: 'white',
-                    border: 'none',
-                    padding: '0.5rem 1rem',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '1rem',
-                  }}
-                >
-                  Sair
-                </button>
-              ) : (
-                <Link
-                  to="/login"
-                  style={{
-                    color: 'white',
-                    textDecoration: 'none',
-                    fontSize: '1rem',
-                    border: '1px solid white',
-                    padding: '0.4rem 0.8rem',
-                    borderRadius: '4px',
-                    transition: '0.3s',
-                  }}
-                >
-                  Login
-                </Link>
-              )}
-            </nav>
-          )}
+                )}
+              </>
+            )}
+          </nav>
         </div>
       )}
     </header>
