@@ -8,6 +8,7 @@ import Register from './Register';
 import AddCifra from './AddCifra';
 import Home from './Home';
 import CifraDetalhe from './CifraDetalhe';
+import Favoritos from './Favoritos';
 
 import { AuthProvider } from './contexts/AuthContext';
 
@@ -83,6 +84,9 @@ function App() {
 
           {/* Editar cifra */}
           <Route path="/edit-cifra/:id" element={<AddCifra setCifras={setCifras} cifras={cifras} />} />
+          {/* favoritos */}
+          <Route path="/favoritos" element={<Favoritos />} />
+
         </Routes>
       </Router>
     </AuthProvider>

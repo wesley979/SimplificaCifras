@@ -38,7 +38,7 @@ const Header = () => {
       <Link
         to="/"
         className="site-title"
-        key={animateKey} // força reinício da animação
+        key={animateKey}
       >
         Simplifica Cifras
       </Link>
@@ -49,6 +49,22 @@ const Header = () => {
             <span style={{ marginRight: '1.5rem' }}>
               Olá, {user.displayName || user.email}
             </span>
+
+            <Link
+              to="/favoritos"
+              style={{
+                color: 'white',
+                marginRight: '1.5rem',
+                textDecoration: 'none',
+                border: '1px solid white',
+                padding: '0.4rem 0.8rem',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '1rem',
+              }}
+            >
+              Favoritos
+            </Link>
 
             {isMaster && (
               <>
