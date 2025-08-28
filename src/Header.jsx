@@ -39,32 +39,15 @@ const Header = () => {
 
   return (
     <header className="header">
-      {/* Título */}
-      <Link to="/" className="site-title" key={animateKey}>
-        Simplifica Cifras
-      </Link>
+      <div className="header-inner">
+        {/* Título */}
+        <Link to="/" className="site-title" key={animateKey}>
+          Simplifica Cifras
+        </Link>
 
-      {/* Desktop navigation */}
-      {!isMobile && (
-        <nav className="desktop-nav">
-          {user ? (
-            <>
-              <span className="user-greeting">Olá, {user.displayName || user.email}</span>
-              <Link to="/favoritos" className="nav-button">Favoritos</Link>
-              {isMaster && <Link to="/add-cifra" className="nav-button">Adicionar Cifra</Link>}
-              <button className="logout-button" onClick={handleLogout}>Sair</button>
-            </>
-          ) : (
-            <Link to="/login" className="nav-button">Login</Link>
-          )}
-        </nav>
-      )}
-
-      {/* Mobile hamburger */}
-      {isMobile && (
-        <div className="mobile-menu-container">
-          <button className="hamburger" onClick={toggleMobileMenu}>☰</button>
-          <nav className={`mobile-nav ${mobileMenuOpen ? 'open' : ''}`}>
+        {/* Desktop navigation */}
+        {!isMobile && (
+          <nav className="desktop-nav">
             {user ? (
               <>
                 <span className="user-greeting">Olá, {user.displayName || user.email}</span>
@@ -76,8 +59,52 @@ const Header = () => {
               <Link to="/login" className="nav-button">Login</Link>
             )}
           </nav>
-        </div>
-      )}
+        )}
+
+        {/* Mobile hamburger */}
+        {isMobile && (
+          <div className="mobile-menu-container">
+            <button className="hamburger" onClick={toggleMobileMenu}>☰</button>
+            <nav className={`mobile-nav ${mobileMenuOpen ? 'open' : ''}`}>
+              {user ? (
+                <>
+                  <span className="user-greeting">Olá, {user.displayName || user.email}</span>
+                  <Link 
+                    to="/favoritos" 
+                    className="nav-button" 
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Favoritos
+                  </Link>
+                  {isMaster && (
+                    <Link 
+                      to="/add-cifra" 
+                      className="nav-button" 
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Adicionar Cifra
+                    </Link>
+                  )}
+                  <button 
+                    className="logout-button" 
+                    onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
+                  >
+                    Sair
+                  </button>
+                </>
+              ) : (
+                <Link 
+                  to="/login" 
+                  className="nav-button" 
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Login
+                </Link>
+              )}
+            </nav>
+          </div>
+        )}
+      </div>
     </header>
   );
 };
