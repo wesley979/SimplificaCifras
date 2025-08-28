@@ -32,7 +32,6 @@ const Header = () => {
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(prev => !prev);
-
     if (!mobileMenuOpen) {
       setTimeout(() => setMobileMenuOpen(false), 5000);
     }
@@ -64,7 +63,7 @@ const Header = () => {
       {/* Desktop navigation */}
       {!isMobile && (
         <nav style={{ display: 'flex', alignItems: 'center' }}>
-          {user && (
+          {user ? (
             <>
               <span style={{ marginRight: '1.5rem' }}>Olá, {user.displayName || user.email}</span>
               <Link
@@ -111,24 +110,21 @@ const Header = () => {
                   </Link>
                 </>
               )}
+              <button
+                onClick={handleLogout}
+                style={{
+                  backgroundColor: '#f44336',
+                  color: 'white',
+                  border: 'none',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '1rem',
+                }}
+              >
+                Sair
+              </button>
             </>
-          )}
-
-          {user ? (
-            <button
-              onClick={handleLogout}
-              style={{
-                backgroundColor: '#f44336',
-                color: 'white',
-                border: 'none',
-                padding: '0.5rem 1rem',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '1rem',
-              }}
-            >
-              Sair
-            </button>
           ) : (
             <Link
               to="/login"
@@ -150,7 +146,7 @@ const Header = () => {
 
       {/* Mobile hamburger */}
       {isMobile && (
-        <>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
           <button
             onClick={toggleMobileMenu}
             style={{
@@ -176,6 +172,7 @@ const Header = () => {
                 flexDirection: 'column',
                 alignItems: 'flex-start',
                 padding: '1rem',
+                zIndex: 1000,
               }}
             >
               {user && (
@@ -227,7 +224,6 @@ const Header = () => {
                   )}
                 </>
               )}
-
               {user ? (
                 <button
                   onClick={handleLogout}
@@ -261,7 +257,7 @@ const Header = () => {
               )}
             </nav>
           )}
-        </>
+        </div>
       )}
     </header>
   );
