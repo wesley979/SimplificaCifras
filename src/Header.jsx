@@ -35,17 +35,21 @@ const Header = () => {
         flexWrap: 'wrap',
       }}
     >
-      <Link
-        to="/"
-        className="site-title"
-        key={animateKey}
-      >
-        Simplifica Cifras
-      </Link>
+      {/* Título e links do lado esquerdo */}
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <Link to="/" className="site-title" key={animateKey}>
+          Simplifica Cifras
+        </Link>
 
-      <nav style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', marginTop: '0.5rem' }}>
-        {user ? (
-          <>
+        {user && (
+          <nav
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              marginLeft: '1.5rem',
+            }}
+          >
             <span style={{ marginRight: '1.5rem' }}>
               Olá, {user.displayName || user.email}
             </span>
@@ -95,56 +99,44 @@ const Header = () => {
                 </Link>
               </>
             )}
-
-            <button
-              onClick={handleLogout}
-              style={{
-                backgroundColor: '#f44336',
-                color: 'white',
-                border: 'none',
-                padding: '0.5rem 1rem',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '1rem',
-              }}
-            >
-              Sair
-            </button>
-          </>
-        ) : (
-          <>
-            <Link
-              to="/login"
-              style={{
-                color: 'white',
-                marginRight: '1.5rem',
-                textDecoration: 'none',
-                fontSize: '1rem',
-                border: '1px solid white',
-                padding: '0.4rem 0.8rem',
-                borderRadius: '4px',
-                transition: '0.3s',
-              }}
-            >
-              Login
-            </Link>
-            <Link
-              to="/register"
-              style={{
-                color: 'white',
-                textDecoration: 'none',
-                fontSize: '1rem',
-                border: '1px solid white',
-                padding: '0.4rem 0.8rem',
-                borderRadius: '4px',
-                transition: '0.3s',
-              }}
-            >
-              Cadastrar
-            </Link>
-          </>
+          </nav>
         )}
-      </nav>
+      </div>
+
+      {/* Botão Login/Sair no lado direito */}
+      <div>
+        {user ? (
+          <button
+            onClick={handleLogout}
+            style={{
+              backgroundColor: '#f44336',
+              color: 'white',
+              border: 'none',
+              padding: '0.5rem 1rem',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '1rem',
+            }}
+          >
+            Sair
+          </button>
+        ) : (
+          <Link
+            to="/login"
+            style={{
+              color: 'white',
+              textDecoration: 'none',
+              fontSize: '1rem',
+              border: '1px solid white',
+              padding: '0.4rem 0.8rem',
+              borderRadius: '4px',
+              transition: '0.3s',
+            }}
+          >
+            Login
+          </Link>
+        )}
+      </div>
     </header>
   );
 };

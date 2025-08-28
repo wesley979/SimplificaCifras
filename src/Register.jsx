@@ -42,12 +42,8 @@ const Register = () => {
 
     setLoading(true);
     try {
-      // Cria o usuário no Firebase
       const userCredential = await register(email, senha);
-
-      // Atualiza o perfil para salvar o nome
       await updateProfile(userCredential.user, { displayName: nome });
-
       alert('Cadastro realizado com sucesso!');
       navigate('/login');
     } catch (error) {
@@ -66,16 +62,36 @@ const Register = () => {
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '2rem auto' }}>
-      <h2>Cadastro</h2>
-      <form onSubmit={handleRegister}>
+    <div
+      style={{
+        maxWidth: '400px',
+        width: '90%',
+        margin: '2rem auto',
+        padding: '2rem',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+        borderRadius: '8px',
+        backgroundColor: '#fff',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <h2 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>Cadastro</h2>
+
+      <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column' }}>
         <input
           type="text"
           placeholder="Nome"
           value={nome}
           onChange={(e) => setNome(e.target.value)}
           required
-          style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
+          style={{
+            width: '100%',
+            padding: '0.75rem',
+            marginBottom: '1rem',
+            fontSize: 'clamp(0.9rem, 1vw, 1rem)',
+            borderRadius: '4px',
+            border: '1px solid #ccc',
+          }}
           disabled={loading}
         />
         <input
@@ -84,7 +100,14 @@ const Register = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
+          style={{
+            width: '100%',
+            padding: '0.75rem',
+            marginBottom: '1rem',
+            fontSize: 'clamp(0.9rem, 1vw, 1rem)',
+            borderRadius: '4px',
+            border: '1px solid #ccc',
+          }}
           disabled={loading}
         />
         <input
@@ -93,7 +116,14 @@ const Register = () => {
           value={senha}
           onChange={(e) => setSenha(e.target.value)}
           required
-          style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
+          style={{
+            width: '100%',
+            padding: '0.75rem',
+            marginBottom: '1rem',
+            fontSize: 'clamp(0.9rem, 1vw, 1rem)',
+            borderRadius: '4px',
+            border: '1px solid #ccc',
+          }}
           disabled={loading}
         />
         <input
@@ -102,9 +132,17 @@ const Register = () => {
           value={confSenha}
           onChange={(e) => setConfSenha(e.target.value)}
           required
-          style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
+          style={{
+            width: '100%',
+            padding: '0.75rem',
+            marginBottom: '1rem',
+            fontSize: 'clamp(0.9rem, 1vw, 1rem)',
+            borderRadius: '4px',
+            border: '1px solid #ccc',
+          }}
           disabled={loading}
         />
+
         <button
           type="submit"
           style={{
@@ -112,16 +150,19 @@ const Register = () => {
             color: 'white',
             padding: '0.75rem 1.5rem',
             border: 'none',
-            borderRadius: '4px',
-            cursor: loading ? 'not-allowed' : 'pointer'
+            borderRadius: '6px',
+            cursor: loading ? 'not-allowed' : 'pointer',
+            fontSize: 'clamp(0.9rem, 1vw, 1rem)',
           }}
           disabled={loading}
         >
           {loading ? 'Cadastrando...' : 'Cadastrar'}
         </button>
       </form>
-      {msg && <p style={{ color: 'red', marginTop: '1rem' }}>{msg}</p>}
-      <p>
+
+      {msg && <p style={{ color: 'red', marginTop: '1rem', textAlign: 'center' }}>{msg}</p>}
+
+      <p style={{ textAlign: 'center', marginTop: '1.5rem' }}>
         Já tem cadastro? <Link to="/login">Faça login aqui</Link>
       </p>
     </div>
