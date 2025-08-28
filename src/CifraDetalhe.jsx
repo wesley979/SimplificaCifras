@@ -137,53 +137,12 @@ export default function CifraDetalhe({ onDelete }) {
     <section
       style={{
         padding: '1rem',
-        paddingBottom: isMobileView ? '6rem' : '5rem',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        position: 'relative',
         minHeight: '100vh',
       }}
     >
-      {/* Contador de visualizações */}
-      <div
-        style={{
-          position: isMobileView ? 'fixed' : 'absolute',
-          top: isMobileView ? 'auto' : 10,
-          bottom: isMobileView ? 70 : 'auto',
-          right: 10,
-          fontWeight: 'bold',
-          fontSize: isMobileView ? '12px' : '16px',
-          color: '#000',
-          zIndex: 10,
-        }}
-      >
-        Visualizações: {views}
-      </div>
-
-      {/* Botão de Favorito (aparece junto do contador no mobile) */}
-      {user && (
-        <button
-          onClick={toggleFavorite}
-          style={{
-            position: isMobileView ? 'fixed' : 'absolute',
-            top: isMobileView ? 'auto' : 40,
-            bottom: isMobileView ? 10 : 'auto',
-            right: 10,
-            backgroundColor: isFavorite ? '#4caf50' : '#4169e1', 
-            color: '#fff',
-            border: 'none',
-            padding: '0.6rem 1rem',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
-            zIndex: 10,
-          }}
-        >
-          {isFavorite ? '★ Favorito' : '☆ Favoritar'}
-        </button>
-      )}
-
       <h2 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
         {cifra?.musica ?? 'Música não informada'} - {cifra?.artista ?? 'Artista não informado'}
       </h2>
@@ -207,6 +166,37 @@ export default function CifraDetalhe({ onDelete }) {
         {cifra?.cifra ?? 'Cifra não disponível.'}
       </pre>
 
+      {/* Footer com botão de favoritar e views */}
+      <div
+        style={{
+          marginTop: '2rem',
+          width: '100%',
+          maxWidth: '700px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        {user && (
+          <button
+            onClick={toggleFavorite}
+            style={{
+              backgroundColor: isFavorite ? '#4caf50' : '#4169e1',
+              color: '#fff',
+              border: 'none',
+              padding: '0.6rem 1rem',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+            }}
+          >
+            {isFavorite ? '★ Favorito' : '☆ Favoritar'}
+          </button>
+        )}
+
+        <div style={{ fontWeight: 'bold', fontSize: '16px' }}>👁️ {views}</div>
+      </div>
+
       {/* Botões de edição e exclusão */}
       {isMaster && (
         <div style={{ marginTop: '1.5rem' }}>
@@ -225,7 +215,6 @@ export default function CifraDetalhe({ onDelete }) {
           display: 'inline-block',
           marginTop: '2rem',
           color: '#007acc',
-          zIndex: 1,
         }}
       >
         ← Voltar para Home
