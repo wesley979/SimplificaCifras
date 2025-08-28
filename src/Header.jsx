@@ -30,7 +30,14 @@ const Header = () => {
     }
   };
 
-  const toggleMobileMenu = () => setMobileMenuOpen(prev => !prev);
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(prev => !prev);
+
+    // Fecha automaticamente após 5 segundos
+    if (!mobileMenuOpen) {
+      setTimeout(() => setMobileMenuOpen(false), 5000);
+    }
+  };
 
   return (
     <header
@@ -45,33 +52,36 @@ const Header = () => {
         position: 'relative',
       }}
     >
-      {/* Título */}
-      <Link
-        to="/"
-        className="site-title"
-        key={animateKey}
-        style={{ fontSize: '1.5rem', fontWeight: 'bold' }}
-      >
-        Simplifica Cifras
-      </Link>
-
-      {/* Botão Hambúrguer (mobile) */}
-      {isMobile && (
-        <button
-          onClick={toggleMobileMenu}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: 'white',
-            fontSize: '1.8rem',
-            cursor: 'pointer',
-          }}
+      {/* Container do título e botão hambúrguer */}
+      <div style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
+        {/* Título */}
+        <Link
+          to="/"
+          className="site-title"
+          key={animateKey}
+          style={{ fontSize: '1.5rem', fontWeight: 'bold' }}
         >
-          ☰
-        </button>
-      )}
+          Simplifica Cifras
+        </Link>
 
-      {/* Links e botão (desktop ou mobile aberto) */}
+        {/* Botão Hambúrguer (aparece apenas no mobile) */}
+        {isMobile && (
+          <button
+            onClick={toggleMobileMenu}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'white',
+              fontSize: '1.8rem',
+              cursor: 'pointer',
+            }}
+          >
+            ☰
+          </button>
+        )}
+      </div>
+
+      {/* Links e botões */}
       {(!isMobile || mobileMenuOpen) && (
         <nav
           style={{
@@ -144,7 +154,6 @@ const Header = () => {
             </>
           )}
 
-          {/* Botão Login/Sair */}
           {user ? (
             <button
               onClick={handleLogout}
