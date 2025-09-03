@@ -15,7 +15,29 @@ import {
 } from './firebase';
 import { useAuth } from './hooks/useAuth';
 
-export default function CifraDetalhe({ onDelete }) {
+// Função para envolver acordes em spans
+const highlightChords = (line) => {
+  const chordRegex = /\b([A-G][#b]?m?(maj|min|sus|dim|aug)?\d?)\b/g;
+  const parts = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = chordRegex.exec(line)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push({ text: line.slice(lastIndex, match.index), isChord: false });
+    }
+    parts.push({ text: match[0], isChord: true });
+    lastIndex = match.index + match[0].length;
+  }
+
+  if (lastIndex < line.length) {
+    parts.push({ text: line.slice(lastIndex), isChord: false });
+  }
+
+  return parts;
+};
+
+const CifraDetalhe = ({ onDelete }) => {
   const { slugOrId } = useParams();
   const navigate = useNavigate();
   const { user, isMaster, loading: authLoading } = useAuth();
@@ -133,96 +155,115 @@ export default function CifraDetalhe({ onDelete }) {
       </div>
     );
 
+  const cifraLines = (cifra?.cifra || '').split('\n');
+
   return (
     <section
       style={{
-        padding: '2rem 1rem',
+        padding: '1rem',
+        minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        minHeight: '100vh',
-        backgroundColor: '#fff', // fundo branco
+        backgroundColor: '#fff',
       }}
     >
-      {/* Container do título e cifra */}
-      <div style={{ maxWidth: '700px', width: '100%', padding: '0 1rem' }}>
-        <h2 style={{ textAlign: 'left', marginBottom: '2rem' }}>
-          {cifra?.musica ?? 'Música não informada'} - {cifra?.artista ?? 'Artista não informado'}
-        </h2>
+      <h2
+        style={{
+          textAlign: 'center',
+          marginBottom: '1.5rem',
+          maxWidth: '700px',
+          width: '100%',
+        }}
+      >
+        {cifra?.musica ?? 'Música não informada'} - {cifra?.artista ?? 'Artista não informado'}
+      </h2>
 
-        <pre
-          style={{
-            whiteSpace: 'pre-wrap', // quebra automática de linha
-            wordBreak: 'break-word',
-            fontFamily: "'Roboto Mono', monospace",
-            fontSize: 'clamp(1rem, 1.1vw, 1.2rem)',
-            lineHeight: 1.5,
-            width: '100%',
-            padding: '1.5rem',
-            borderRadius: '8px',
-            backgroundColor: '#fff', // fundo branco
-            color: '#222',
-            boxShadow: 'none',
-            overflowX: 'hidden', // remove scroll lateral
-            textAlign: 'left',
-          }}
-        >
-          {cifra?.cifra ?? 'Cifra não disponível.'}
-        </pre>
-
-        {/* Footer com botão de favoritar e views */}
-        <div
-          style={{
-            marginTop: '2rem',
-            width: '100%',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          {user && (
-            <button
-              onClick={toggleFavorite}
-              style={{
-                backgroundColor: isFavorite ? '#4caf50' : '#4169e1',
-                color: '#fff',
-                border: 'none',
-                padding: '0.6rem 1rem',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontWeight: 'bold',
-              }}
-            >
-              {isFavorite ? '★ Favorito' : '☆ Favoritar'}
-            </button>
-          )}
-
-          <div style={{ fontWeight: 'bold', fontSize: '16px' }}>👁️ {views}</div>
-        </div>
-
-        {/* Botões de edição e exclusão */}
-        {isMaster && (
-          <div style={{ marginTop: '1.5rem' }}>
-            <button onClick={handleEditar} style={{ marginRight: '1rem' }}>
-              Editar
-            </button>
-            <button onClick={handleDelete} disabled={deleting}>
-              {deleting ? 'Excluindo...' : 'Excluir'}
-            </button>
+      <div
+        style={{
+          fontFamily: 'monospace',
+          fontSize: 'clamp(1rem, 1.1vw, 1.2rem)',
+          maxWidth: '700px',
+          width: '100%',
+          lineHeight: '1.2', // <---- MENOR ESPAÇAMENTO
+          textAlign: 'left',
+          color: '#222',
+          whiteSpace: 'pre-wrap',
+          wordBreak: 'break-word',
+        }}
+      >
+        {cifraLines.map((line, idx) => (
+          <div key={idx} style={{ marginBottom: '0.15rem' }}> {/* <---- ESPAÇAMENTO ENTRE LINHAS MENOR */}
+            {highlightChords(line).map((part, i) =>
+              part.isChord ? (
+                <span key={i} style={{ color: '#4169e1', fontWeight: 'bold' }}>
+                  {part.text}
+                </span>
+              ) : (
+                <span key={i}>{part.text}</span>
+              )
+            )}
           </div>
+        ))}
+      </div>
+
+      {/* Footer com botão de favoritar e views */}
+      <div
+        style={{
+          marginTop: '2rem',
+          width: '100%',
+          maxWidth: '700px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+        }}
+      >
+        {user && (
+          <button
+            onClick={toggleFavorite}
+            style={{
+              backgroundColor: isFavorite ? '#4caf50' : '#4169e1',
+              color: '#fff',
+              border: 'none',
+              padding: '0.6rem 1rem',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              marginBottom: '0.5rem',
+            }}
+          >
+            {isFavorite ? '★ Favorito' : '☆ Favoritar'}
+          </button>
         )}
 
-        <Link
-          to="/"
-          style={{
-            display: 'inline-block',
-            marginTop: '2rem',
-            color: '#007acc',
-          }}
-        >
-          ← Voltar para Home
-        </Link>
+        <div style={{ fontWeight: 'bold', fontSize: '16px' }}>👁️ {views}</div>
       </div>
+
+      {/* Botões de edição e exclusão */}
+      {isMaster && (
+        <div style={{ marginTop: '1.5rem' }}>
+          <button onClick={handleEditar} style={{ marginRight: '1rem' }}>
+            Editar
+          </button>
+          <button onClick={handleDelete} disabled={deleting}>
+            {deleting ? 'Excluindo...' : 'Excluir'}
+          </button>
+        </div>
+      )}
+
+      <Link
+        to="/"
+        style={{
+          display: 'inline-block',
+          marginTop: '2rem',
+          color: '#007acc',
+        }}
+      >
+        ← Voltar para Home
+      </Link>
     </section>
   );
-}
+};
+
+export default CifraDetalhe;
