@@ -136,89 +136,93 @@ export default function CifraDetalhe({ onDelete }) {
   return (
     <section
       style={{
-        padding: '1rem',
+        padding: '2rem 1rem',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         minHeight: '100vh',
+        backgroundColor: '#fff', // fundo branco
       }}
     >
-      <h2 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-        {cifra?.musica ?? 'Música não informada'} - {cifra?.artista ?? 'Artista não informado'}
-      </h2>
+      {/* Container do título e cifra */}
+      <div style={{ maxWidth: '700px', width: '100%', padding: '0 1rem' }}>
+        <h2 style={{ textAlign: 'left', marginBottom: '2rem' }}>
+          {cifra?.musica ?? 'Música não informada'} - {cifra?.artista ?? 'Artista não informado'}
+        </h2>
 
-      <pre
-        style={{
-          overflowX: 'auto',
-          whiteSpace: 'pre',
-          fontFamily: 'monospace',
-          fontSize: 'clamp(1rem, 1.1vw, 1.2rem)',
-          maxWidth: '700px',
-          width: '100%',
-          padding: '1.5rem',
-          borderRadius: '8px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-          textAlign: 'left',
-          backgroundColor: '#e8e8e8',
-          color: '#222',
-        }}
-      >
-        {cifra?.cifra ?? 'Cifra não disponível.'}
-      </pre>
+        <pre
+          style={{
+            whiteSpace: 'pre-wrap', // quebra automática de linha
+            wordBreak: 'break-word',
+            fontFamily: "'Roboto Mono', monospace",
+            fontSize: 'clamp(1rem, 1.1vw, 1.2rem)',
+            lineHeight: 1.5,
+            width: '100%',
+            padding: '1.5rem',
+            borderRadius: '8px',
+            backgroundColor: '#fff', // fundo branco
+            color: '#222',
+            boxShadow: 'none',
+            overflowX: 'hidden', // remove scroll lateral
+            textAlign: 'left',
+          }}
+        >
+          {cifra?.cifra ?? 'Cifra não disponível.'}
+        </pre>
 
-      {/* Footer com botão de favoritar e views */}
-      <div
-        style={{
-          marginTop: '2rem',
-          width: '100%',
-          maxWidth: '700px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        {user && (
-          <button
-            onClick={toggleFavorite}
-            style={{
-              backgroundColor: isFavorite ? '#4caf50' : '#4169e1',
-              color: '#fff',
-              border: 'none',
-              padding: '0.6rem 1rem',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-            }}
-          >
-            {isFavorite ? '★ Favorito' : '☆ Favoritar'}
-          </button>
+        {/* Footer com botão de favoritar e views */}
+        <div
+          style={{
+            marginTop: '2rem',
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          {user && (
+            <button
+              onClick={toggleFavorite}
+              style={{
+                backgroundColor: isFavorite ? '#4caf50' : '#4169e1',
+                color: '#fff',
+                border: 'none',
+                padding: '0.6rem 1rem',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+              }}
+            >
+              {isFavorite ? '★ Favorito' : '☆ Favoritar'}
+            </button>
+          )}
+
+          <div style={{ fontWeight: 'bold', fontSize: '16px' }}>👁️ {views}</div>
+        </div>
+
+        {/* Botões de edição e exclusão */}
+        {isMaster && (
+          <div style={{ marginTop: '1.5rem' }}>
+            <button onClick={handleEditar} style={{ marginRight: '1rem' }}>
+              Editar
+            </button>
+            <button onClick={handleDelete} disabled={deleting}>
+              {deleting ? 'Excluindo...' : 'Excluir'}
+            </button>
+          </div>
         )}
 
-        <div style={{ fontWeight: 'bold', fontSize: '16px' }}>👁️ {views}</div>
+        <Link
+          to="/"
+          style={{
+            display: 'inline-block',
+            marginTop: '2rem',
+            color: '#007acc',
+          }}
+        >
+          ← Voltar para Home
+        </Link>
       </div>
-
-      {/* Botões de edição e exclusão */}
-      {isMaster && (
-        <div style={{ marginTop: '1.5rem' }}>
-          <button onClick={handleEditar} style={{ marginRight: '1rem' }}>
-            Editar
-          </button>
-          <button onClick={handleDelete} disabled={deleting}>
-            {deleting ? 'Excluindo...' : 'Excluir'}
-          </button>
-        </div>
-      )}
-
-      <Link
-        to="/"
-        style={{
-          display: 'inline-block',
-          marginTop: '2rem',
-          color: '#007acc',
-        }}
-      >
-        ← Voltar para Home
-      </Link>
     </section>
   );
 }
