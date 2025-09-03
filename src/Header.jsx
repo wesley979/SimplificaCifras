@@ -4,7 +4,7 @@ import { useAuth } from './hooks/useAuth';
 import './Header.css';
 
 const Header = () => {
-  const { user, isMaster, logout } = useAuth();
+  const { user, isMaster, logout, loading } = useAuth(); // pegando loading
   const navigate = useNavigate();
   const location = useLocation();
   const [animateKey, setAnimateKey] = useState(0);
@@ -37,6 +37,12 @@ const Header = () => {
     }
   };
 
+  // Função para mostrar saudação apenas quando não estiver carregando
+  const renderUserGreeting = () => {
+    if (loading || !user) return null; // enquanto carrega ou não tem user, não mostra nada
+    return <span className="user-greeting">Olá, {user.displayName || user.email}</span>;
+  };
+
   return (
     <header className="header">
       <div className="header-inner">
@@ -50,7 +56,7 @@ const Header = () => {
           <nav className="desktop-nav">
             {user ? (
               <>
-                <span className="user-greeting">Olá, {user.displayName || user.email}</span>
+                {renderUserGreeting()}
                 <Link to="/favoritos" className="nav-button">Favoritos</Link>
                 {isMaster && <Link to="/add-cifra" className="nav-button">Adicionar Cifra</Link>}
                 <button className="logout-button" onClick={handleLogout}>Sair</button>
@@ -68,7 +74,7 @@ const Header = () => {
             <nav className={`mobile-nav ${mobileMenuOpen ? 'open' : ''}`}>
               {user ? (
                 <>
-                  <span className="user-greeting">Olá, {user.displayName || user.email}</span>
+                  {renderUserGreeting()}
                   <Link 
                     to="/favoritos" 
                     className="nav-button" 

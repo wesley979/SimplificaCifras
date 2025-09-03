@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
-import { updateProfile } from 'firebase/auth';
+import { updateProfile, signOut } from 'firebase/auth';
+import { auth } from './firebase';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ const Register = () => {
   const [senha, setSenha] = useState('');
   const [confSenha, setConfSenha] = useState('');
   const [msg, setMsg] = useState('');
+  const [msgTipo, setMsgTipo] = useState(''); // success ou error
   const [loading, setLoading] = useState(false);
 
   const validarSenha = (senha) => senha.length >= 6;
@@ -19,34 +21,53 @@ const Register = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     setMsg('');
+    setMsgTipo('');
 
     if (!nome.trim()) {
       setMsg('Por favor, informe seu nome.');
+      setMsgTipo('error');
       return;
     }
 
     if (!email.trim()) {
       setMsg('Por favor, informe seu e-mail.');
+      setMsgTipo('error');
       return;
     }
 
     if (!validarSenha(senha)) {
       setMsg('A senha deve ter pelo menos 6 caracteres.');
+      setMsgTipo('error');
       return;
     }
 
     if (senha !== confSenha) {
       setMsg('As senhas não coincidem.');
+      setMsgTipo('error');
       return;
     }
 
     setLoading(true);
     try {
       const userCredential = await register(email, senha);
+
+      // Atualiza o displayName no Firebase
       await updateProfile(userCredential.user, { displayName: nome });
-      alert('Cadastro realizado com sucesso!');
-      navigate('/login');
+
+      // Faz logout para não manter o usuário logado automaticamente
+      await signOut(auth);
+
+      // Mensagem de sucesso
+      setMsg('Usuário cadastrado com sucesso! Faça login.');
+      setMsgTipo('success');
+
+      // Redireciona para login após 1.5s
+      setTimeout(() => {
+        navigate('/login');
+      }, 1500);
+
     } catch (error) {
+      setMsgTipo('error');
       if (error.code === 'auth/email-already-in-use') {
         setMsg('Este e-mail já está em uso.');
       } else if (error.code === 'auth/invalid-email') {
@@ -160,7 +181,17 @@ const Register = () => {
         </button>
       </form>
 
-      {msg && <p style={{ color: 'red', marginTop: '1rem', textAlign: 'center' }}>{msg}</p>}
+      {msg && (
+        <p
+          style={{
+            color: msgTipo === 'success' ? 'green' : 'red',
+            marginTop: '1rem',
+            textAlign: 'center',
+          }}
+        >
+          {msg}
+        </p>
+      )}
 
       <p style={{ textAlign: 'center', marginTop: '1.5rem' }}>
         Já tem cadastro? <Link to="/login">Faça login aqui</Link>

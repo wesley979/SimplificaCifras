@@ -11,15 +11,19 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthChange(async (currentUser) => {
       if (currentUser) {
-        // Busca dados adicionais do Firestore
         try {
+          // Atualiza informações do usuário logado
+          await currentUser.reload();
+
+          setUser({
+            uid: currentUser.uid,
+            email: currentUser.email,
+            displayName: currentUser.displayName || '',
+          });
+
+          // Busca dados adicionais no Firestore
           const userDocRef = doc(db, 'usuarios', currentUser.uid);
           const userDocSnap = await getDoc(userDocRef);
-
-        console.log('userDocSnap.exists():', userDocSnap.exists()); // DEBUG
-        console.log('userDocSnap.data():', userDocSnap.data()); // DEBUG
-
-
           if (userDocSnap.exists()) {
             const userData = userDocSnap.data();
             setIsMaster(userData.isMaster === true);
@@ -30,13 +34,6 @@ export const AuthProvider = ({ children }) => {
           console.error('Erro ao buscar dados do usuário:', err);
           setIsMaster(false);
         }
-
-        // Salva usuário no estado
-        setUser({
-          uid: currentUser.uid,
-          email: currentUser.email,
-          displayName: currentUser.displayName || '',
-        });
       } else {
         setUser(null);
         setIsMaster(false);
@@ -48,7 +45,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = (email, password) => loginUser(email, password);
-  const register = (email, password) => registerUser(email, password);
+  const register = (email, password) => registerUser(email, password); // só registra, não muda estado
   const logout = async () => {
     await logoutUser();
     setUser(null);
