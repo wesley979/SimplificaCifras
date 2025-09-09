@@ -1,0 +1,184 @@
+/* CifraDetalhe.css */
+
+/* -----------------------------
+   Container principal
+----------------------------- */
+.cifra-container {
+  padding: 2rem 1rem;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #fff;
+}
+
+/* -----------------------------
+   Título da música e artista
+----------------------------- */
+.cifra-title {
+  text-align: center;
+  margin-bottom: 1rem;
+  max-width: 700px;
+  width: 100%;
+  font-size: 1.5rem; /* desktop padrão */
+  font-weight: bold;
+}
+
+/* -----------------------------
+   Botões de transposição de tom
+----------------------------- */
+.transpose-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.transpose-buttons button {
+  padding: 0.1rem 0.1rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  border-radius: 8px;
+  min-width: 50px;
+  border: none;
+  background-color: #4169e1;
+  color: #fff;
+  font-weight: bold;
+}
+
+.transpose-label {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+/* -----------------------------
+   Conteúdo da cifra (letra + acordes)
+----------------------------- */
+.cifra-content {
+  font-family: monospace;
+  font-size: clamp(1rem, 1.1vw, 1.2rem);
+  max-width: 700px;
+  width: 100%;
+  line-height: 1.2;
+  text-align: left;
+  color: #222;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.cifra-line {
+  margin-bottom: 0.15rem;
+}
+
+.cifra-chord {
+  color: #4169e1;
+  font-weight: bold;
+}
+
+/* -----------------------------
+   Footer com botão de favoritar e views
+----------------------------- */
+.cifra-footer {
+  margin-top: 2rem;
+  width: 100%;
+  max-width: 700px;
+  display: flex;
+  justify-content: center; /* centralizado */
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.favorite-button {
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 0.6rem 1rem;
+  border: none;
+}
+
+.views-count {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+/* -----------------------------
+   Botões de edição e exclusão (master)
+----------------------------- */
+.master-buttons {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.master-buttons button {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-radius: 6px;
+  border: none;
+  background-color: #4169e1;
+  color: #fff;
+  font-weight: bold;
+}
+
+.master-buttons button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* -----------------------------
+   Link de voltar
+----------------------------- */
+.back-link {
+  display: inline-block;
+  margin-top: 2rem;
+  color: #007acc;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* -----------------------------
+   Container de erro
+----------------------------- */
+.error-container {
+  padding: 1rem;
+  text-align: center;
+}
+
+.error-text {
+  color: red;
+}
+
+/* -----------------------------
+   Media Queries - Responsividade
+----------------------------- */
+@media (max-width: 600px) {
+  /* Título menor no mobile */
+  .cifra-title {
+    font-size: 1.2rem;
+  }
+
+  /* Fonte da cifra menor no mobile */
+  .cifra-content {
+    font-size: 0.9rem;
+  }
+
+  /* Botões de transposição menores */
+  .transpose-buttons button {
+    font-size: 1rem;
+    padding: 0.4rem 0.8rem;
+    min-width: 40px;
+  }
+
+  /* Footer mais compacto */
+  .cifra-footer {
+    gap: 0.5rem;
+  }
+
+  /* Botões master menores */
+  .master-buttons button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+}

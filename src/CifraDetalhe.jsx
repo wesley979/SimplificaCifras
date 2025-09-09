@@ -14,9 +14,33 @@ import {
   deleteDoc,
 } from './firebase';
 import { useAuth } from './hooks/useAuth';
+import './CifraDetalhe.css'; // Importando o CSS separado
 
-// Função para envolver acordes em spans
-const highlightChords = (line) => {
+// -----------------------------
+// Função utilitária para transpor acordes
+// -----------------------------
+const NOTES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+const ENHARMONIC_MAP = { Db: "C#", Eb: "D#", Gb: "F#", Ab: "G#", Bb: "A#" };
+
+function extractRoot(chord) {
+  const match = chord.match(/^[A-G][#b]?/);
+  return match ? match[0] : chord;
+}
+
+function transposeChord(chord, steps) {
+  if (!chord) return chord;
+  const root = extractRoot(chord);
+  const suffix = chord.slice(root.length);
+  const normalized = ENHARMONIC_MAP[root] || root;
+  const index = NOTES.indexOf(normalized);
+  if (index === -1) return chord;
+  const newIndex = (index + steps + 12) % 12;
+  const newRoot = NOTES[newIndex];
+  return newRoot + suffix;
+}
+
+// Função para envolver acordes em spans (letra não vira acorde)
+const highlightChords = (line, transposeSteps) => {
   const chordRegex = /\b([A-G][#b]?m?(maj|min|sus|dim|aug)?\d?)\b/g;
   const parts = [];
   let lastIndex = 0;
@@ -26,7 +50,9 @@ const highlightChords = (line) => {
     if (match.index > lastIndex) {
       parts.push({ text: line.slice(lastIndex, match.index), isChord: false });
     }
-    parts.push({ text: match[0], isChord: true });
+    const originalChord = match[0];
+    const transposed = transposeChord(originalChord, transposeSteps);
+    parts.push({ text: transposed, isChord: true });
     lastIndex = match.index + match[0].length;
   }
 
@@ -50,18 +76,18 @@ const CifraDetalhe = ({ onDelete }) => {
   const [isFavorite, setIsFavorite] = useState(false);
 
   const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 600);
+  const [transposeSteps, setTransposeSteps] = useState(0);
+
   useEffect(() => {
     const handleResize = () => setIsMobileView(window.innerWidth <= 600);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Busca a cifra
   useEffect(() => {
     const fetchCifra = async () => {
       setLoading(true);
       setError('');
-
       try {
         let docSnap;
         const docRef = doc(db, 'cifras', slugOrId);
@@ -79,7 +105,6 @@ const CifraDetalhe = ({ onDelete }) => {
           const data = docSnap.data();
           setCifra({ id: docSnap.id, ...data });
           setViews(data.views || 0);
-
           try {
             await updateDoc(doc(db, 'cifras', docSnap.id), { views: increment(1) });
             setViews((prev) => prev + 1);
@@ -144,12 +169,11 @@ const CifraDetalhe = ({ onDelete }) => {
   };
 
   if (loading || authLoading) return <p>Carregando...</p>;
-
   if (error)
     return (
-      <div style={{ padding: '1rem', textAlign: 'center' }}>
-        <p style={{ color: 'red' }}>{error}</p>
-        <Link to="/" style={{ color: '#007acc' }}>
+      <div className="error-container">
+        <p className="error-text">{error}</p>
+        <Link to="/" className="back-link">
           Voltar para Home
         </Link>
       </div>
@@ -158,47 +182,23 @@ const CifraDetalhe = ({ onDelete }) => {
   const cifraLines = (cifra?.cifra || '').split('\n');
 
   return (
-    <section
-      style={{
-        padding: '1rem',
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-      }}
-    >
-      <h2
-        style={{
-          textAlign: 'center',
-          marginBottom: '1.5rem',
-          maxWidth: '700px',
-          width: '100%',
-        }}
-      >
+    <section className="cifra-container">
+      <h2 className="cifra-title">
         {cifra?.musica ?? 'Música não informada'} - {cifra?.artista ?? 'Artista não informado'}
       </h2>
 
-      <div
-        style={{
-          fontFamily: 'monospace',
-          fontSize: 'clamp(1rem, 1.1vw, 1.2rem)',
-          maxWidth: '700px',
-          width: '100%',
-          lineHeight: '1.2', // <---- MENOR ESPAÇAMENTO
-          textAlign: 'left',
-          color: '#222',
-          whiteSpace: 'pre-wrap',
-          wordBreak: 'break-word',
-        }}
-      >
+      <div className="transpose-buttons">
+        <button onClick={() => setTransposeSteps((s) => (s - 1 + NOTES.length) % NOTES.length)}>-</button>
+        <span className="transpose-label">Tom</span>
+        <button onClick={() => setTransposeSteps((s) => (s + 1) % NOTES.length)}>+</button>
+      </div>
+
+      <div className="cifra-content">
         {cifraLines.map((line, idx) => (
-          <div key={idx} style={{ marginBottom: '0.15rem' }}> {/* <---- ESPAÇAMENTO ENTRE LINHAS MENOR */}
-            {highlightChords(line).map((part, i) =>
+          <div key={idx} className="cifra-line">
+            {highlightChords(line, transposeSteps).map((part, i) =>
               part.isChord ? (
-                <span key={i} style={{ color: '#4169e1', fontWeight: 'bold' }}>
-                  {part.text}
-                </span>
+                <span key={i} className="cifra-chord">{part.text}</span>
               ) : (
                 <span key={i}>{part.text}</span>
               )
@@ -207,61 +207,29 @@ const CifraDetalhe = ({ onDelete }) => {
         ))}
       </div>
 
-      {/* Footer com botão de favoritar e views */}
-      <div
-        style={{
-          marginTop: '2rem',
-          width: '100%',
-          maxWidth: '700px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-        }}
-      >
+      <div className="cifra-footer">
         {user && (
           <button
             onClick={toggleFavorite}
-            style={{
-              backgroundColor: isFavorite ? '#4caf50' : '#4169e1',
-              color: '#fff',
-              border: 'none',
-              padding: '0.6rem 1rem',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              marginBottom: '0.5rem',
-            }}
+            className="favorite-button"
+            style={{ backgroundColor: isFavorite ? '#4caf50' : '#4169e1' }}
           >
             {isFavorite ? '★ Favorito' : '☆ Favoritar'}
           </button>
         )}
-
-        <div style={{ fontWeight: 'bold', fontSize: '16px' }}>👁️ {views}</div>
+        <div className="views-count">👁️ {views}</div>
       </div>
 
-      {/* Botões de edição e exclusão */}
       {isMaster && (
-        <div style={{ marginTop: '1.5rem' }}>
-          <button onClick={handleEditar} style={{ marginRight: '1rem' }}>
-            Editar
-          </button>
+        <div className="master-buttons">
+          <button onClick={handleEditar}>Editar</button>
           <button onClick={handleDelete} disabled={deleting}>
             {deleting ? 'Excluindo...' : 'Excluir'}
           </button>
         </div>
       )}
 
-      <Link
-        to="/"
-        style={{
-          display: 'inline-block',
-          marginTop: '2rem',
-          color: '#007acc',
-        }}
-      >
-        ← Voltar para Home
-      </Link>
+      <Link to="/" className="back-link">← Voltar para Home</Link>
     </section>
   );
 };
