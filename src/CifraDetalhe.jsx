@@ -1,23 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import {
-  db,
-  doc,
-  getDoc,
-  updateDoc,
-  increment,
-  collection,
-  query,
-  where,
-  getDocs,
-  setDoc,
-  deleteDoc,
-} from './firebase';
+import { db, doc, getDoc, updateDoc, increment, setDoc, deleteDoc } from './firebase';
 import { useAuth } from './hooks/useAuth';
-import './CifraDetalhe.css'; // Importando o CSS separado
+import './CifraDetalhe.css';
 
 // -----------------------------
-// Função utilitária para transpor acordes
+// Função para transpor acordes
 // -----------------------------
 const NOTES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 const ENHARMONIC_MAP = { Db: "C#", Eb: "D#", Gb: "F#", Ab: "G#", Bb: "A#" };
@@ -39,7 +27,6 @@ function transposeChord(chord, steps) {
   return newRoot + suffix;
 }
 
-// Função para envolver acordes em spans (letra não vira acorde)
 const highlightChords = (line, transposeSteps) => {
   const chordRegex = /\b([A-G][#b]?m?(maj|min|sus|dim|aug)?\d?)\b/g;
   const parts = [];
@@ -64,7 +51,7 @@ const highlightChords = (line, transposeSteps) => {
 };
 
 const CifraDetalhe = ({ onDelete }) => {
-  const { slugOrId } = useParams();
+  const { slugOrId } = useParams(); // vamos usar ID
   const navigate = useNavigate();
   const { user, isMaster, loading: authLoading } = useAuth();
 
@@ -74,52 +61,37 @@ const CifraDetalhe = ({ onDelete }) => {
   const [error, setError] = useState('');
   const [deleting, setDeleting] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
-
-  const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 600);
   const [transposeSteps, setTransposeSteps] = useState(0);
-
-  useEffect(() => {
-    const handleResize = () => setIsMobileView(window.innerWidth <= 600);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   useEffect(() => {
     const fetchCifra = async () => {
       setLoading(true);
       setError('');
       try {
-        let docSnap;
         const docRef = doc(db, 'cifras', slugOrId);
-        docSnap = await getDoc(docRef);
+        const docSnap = await getDoc(docRef);
 
         if (!docSnap.exists()) {
-          const q = query(collection(db, 'cifras'), where('slug', '==', slugOrId));
-          const querySnapshot = await getDocs(q);
-          if (!querySnapshot.empty) {
-            docSnap = querySnapshot.docs[0];
-          }
-        }
-
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          setCifra({ id: docSnap.id, ...data });
-          setViews(data.views || 0);
-          try {
-            await updateDoc(doc(db, 'cifras', docSnap.id), { views: increment(1) });
-            setViews((prev) => prev + 1);
-          } catch (err) {
-            console.error('Erro ao atualizar views:', err.message);
-          }
-
-          if (user) {
-            const favDocRef = doc(db, 'usuarios', user.uid, 'favorites', docSnap.id);
-            const favSnap = await getDoc(favDocRef);
-            setIsFavorite(favSnap.exists());
-          }
-        } else {
           setError('Cifra não encontrada.');
+          setLoading(false);
+          return;
         }
+
+        const data = docSnap.data();
+        setCifra({ id: docSnap.id, ...data });
+        setViews(data.views || 0);
+
+        // Atualiza visualizações
+        await updateDoc(docRef, { views: increment(1) });
+        setViews(prev => prev + 1);
+
+        // Checa se é favorito
+        if (user) {
+          const favDocRef = doc(db, 'usuarios', user.uid, 'favorites', docSnap.id);
+          const favSnap = await getDoc(favDocRef);
+          setIsFavorite(favSnap.exists());
+        }
+
       } catch (err) {
         setError('Erro ao buscar cifra: ' + err.message);
       } finally {
@@ -140,10 +112,7 @@ const CifraDetalhe = ({ onDelete }) => {
         await deleteDoc(favDocRef);
         setIsFavorite(false);
       } else {
-        await setDoc(favDocRef, {
-          cifraId: cifra.id,
-          favoritedAt: new Date().toISOString(),
-        });
+        await setDoc(favDocRef, { cifraId: cifra.id, favoritedAt: new Date().toISOString() });
         setIsFavorite(true);
       }
     } catch (err) {
@@ -164,73 +133,46 @@ const CifraDetalhe = ({ onDelete }) => {
     }
   };
 
-  const handleEditar = () => {
-    navigate('/edit-cifra/' + cifra.id);
-  };
+  const handleEditar = () => navigate('/edit-cifra/' + cifra.id);
 
   if (loading || authLoading) return <p>Carregando...</p>;
-  if (error)
-    return (
-      <div className="error-container">
-        <p className="error-text">{error}</p>
-        <Link to="/" className="back-link">
-          Voltar para Home
-        </Link>
-      </div>
-    );
+  if (error) return <div><p>{error}</p><Link to="/">← Voltar para Home</Link></div>;
 
   const cifraLines = (cifra?.cifra || '').split('\n');
 
   return (
-    <section className="cifra-container">
-      <h2 className="cifra-title">
-        {cifra?.musica ?? 'Música não informada'} - {cifra?.artista ?? 'Artista não informado'}
-      </h2>
+    <div className="cifra-container">
+      <h2>{cifra.musica} - {cifra.artista}</h2>
 
       <div className="transpose-buttons">
-        <button onClick={() => setTransposeSteps((s) => (s - 1 + NOTES.length) % NOTES.length)}>-</button>
-        <span className="transpose-label">Tom</span>
-        <button onClick={() => setTransposeSteps((s) => (s + 1) % NOTES.length)}>+</button>
+        <button onClick={() => setTransposeSteps(s => (s - 1 + NOTES.length) % NOTES.length)}>-</button>
+        <span>Tom</span>
+        <button onClick={() => setTransposeSteps(s => (s + 1) % NOTES.length)}>+</button>
       </div>
 
-      <div className="cifra-content">
+      <div>
         {cifraLines.map((line, idx) => (
-          <div key={idx} className="cifra-line">
+          <div key={idx}>
             {highlightChords(line, transposeSteps).map((part, i) =>
-              part.isChord ? (
-                <span key={i} className="cifra-chord">{part.text}</span>
-              ) : (
-                <span key={i}>{part.text}</span>
-              )
+              <span key={i} style={{ fontWeight: part.isChord ? 'bold' : 'normal' }}>
+                {part.text}
+              </span>
             )}
           </div>
         ))}
       </div>
 
-      <div className="cifra-footer">
-        {user && (
-          <button
-            onClick={toggleFavorite}
-            className="favorite-button"
-            style={{ backgroundColor: isFavorite ? '#4caf50' : '#4169e1' }}
-          >
-            {isFavorite ? '★ Favorito' : '☆ Favoritar'}
-          </button>
-        )}
-        <div className="views-count">👁️ {views}</div>
-      </div>
+      {user && <button onClick={toggleFavorite}>{isFavorite ? '★ Favorito' : '☆ Favoritar'}</button>}
 
       {isMaster && (
-        <div className="master-buttons">
+        <div>
           <button onClick={handleEditar}>Editar</button>
-          <button onClick={handleDelete} disabled={deleting}>
-            {deleting ? 'Excluindo...' : 'Excluir'}
-          </button>
+          <button onClick={handleDelete} disabled={deleting}>{deleting ? 'Excluindo...' : 'Excluir'}</button>
         </div>
       )}
 
-      <Link to="/" className="back-link">← Voltar para Home</Link>
-    </section>
+      <Link to="/">← Voltar para Home</Link>
+    </div>
   );
 };
 
