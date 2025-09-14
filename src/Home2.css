@@ -1,0 +1,233 @@
+/* Container principal */
+.home2 {
+  font-family: 'Arial', sans-serif;
+  color: #fff;
+  background: #000;
+  min-height: 100vh;
+}
+
+/* Header */
+.home2-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: #111;
+  border-bottom: 1px solid #222;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo {
+  font-size: 26px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* Menu desktop */
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* Espaçamento lateral entre span e botões */
+}
+
+.user-info span {
+  /* sem margin-right, o gap já resolve */
+}
+
+/* Botões e links */
+.header-right a,
+.header-right button {
+  background: #6a0dad; /* Roxo */
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.header-right a:hover,
+.header-right button:hover {
+  background: #7d24c9; /* Roxo mais claro no hover */
+  transform: translateY(-2px);
+}
+
+/* Mobile menu */
+.mobile-menu {
+  display: none;
+}
+
+.hamburger-btn {
+  font-size: 20px;
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+}
+
+.mobile-menu-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #111;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 6px;
+}
+
+.mobile-menu-items a,
+.mobile-menu-items button {
+  background: #6a0dad; /* Roxo */
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  text-align: center;
+  color: #fff;
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.hero h2 {
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+.hero h2 span {
+  color: #6a0dad; /* Roxinho nos destaques */
+}
+
+.hero p {
+  font-size: 18px;
+  color: #ccc;
+}
+
+.search-box {
+  margin-top: 20px;
+}
+
+.search-box input {
+  width: 100%;
+  max-width: 500px;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+}
+
+/* Resultados e gêneros */
+.results,
+.genres {
+  padding: 30px 20px;
+}
+
+.results h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #6a0dad; /* Roxo nos títulos de resultados */
+}
+
+.genres h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #fff; /* Branco em "Explore por Categoria" */
+}
+
+.results-grid,
+.genres-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+}
+
+.song-card,
+.genre-card {
+  background: #1a1a1a;
+  padding: 15px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+  text-align: center;
+}
+
+.song-card:hover,
+.genre-card:hover {
+  transform: translateY(-4px);
+  background: #2a2a2a;
+}
+
+/* Stats */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+  padding: 40px 20px;
+  background: #111;
+  margin-top: 30px;
+}
+
+.stat-card {
+  text-align: center;
+  background: #1a1a1a;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.stat-card .value {
+  font-size: 28px;
+  font-weight: bold;
+  color: #6a0dad; /* Roxinho nos números */
+  margin-bottom: 8px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .header-right {
+    display: none;
+  }
+  .mobile-menu {
+    display: block;
+  }
+  .hero h2 {
+    font-size: 24px;
+  }
+  .hero p {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .results-grid,
+  .genres-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero h2 {
+    font-size: 22px;
+  }
+
+  .home2-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
