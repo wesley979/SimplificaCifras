@@ -5,7 +5,7 @@ import { useAuth } from './hooks/useAuth';
 import './CifraDetalhe.css';
 
 // -----------------------------
-// Função para transpor acordes
+// Transposição de acordes
 // -----------------------------
 const NOTES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 const ENHARMONIC_MAP = { Db: "C#", Eb: "D#", Gb: "F#", Ab: "G#", Bb: "A#" };
@@ -51,7 +51,7 @@ const highlightChords = (line, transposeSteps) => {
 };
 
 const CifraDetalhe = ({ onDelete }) => {
-  const { slugOrId } = useParams(); // vamos usar ID
+  const { slugOrId } = useParams(); 
   const navigate = useNavigate();
   const { user, isMaster, loading: authLoading } = useAuth();
 
@@ -81,11 +81,11 @@ const CifraDetalhe = ({ onDelete }) => {
         setCifra({ id: docSnap.id, ...data });
         setViews(data.views || 0);
 
-        // Atualiza visualizações
+        // Incrementa views
         await updateDoc(docRef, { views: increment(1) });
         setViews(prev => prev + 1);
 
-        // Checa se é favorito
+        // Verifica se é favorito
         if (user) {
           const favDocRef = doc(db, 'usuarios', user.uid, 'favorites', docSnap.id);
           const favSnap = await getDoc(favDocRef);
@@ -98,6 +98,7 @@ const CifraDetalhe = ({ onDelete }) => {
         setLoading(false);
       }
     };
+
     fetchCifra();
   }, [slugOrId, user]);
 
@@ -125,7 +126,7 @@ const CifraDetalhe = ({ onDelete }) => {
     setDeleting(true);
     try {
       await onDelete(cifra.id);
-      navigate('/');
+      navigate('/home2');
     } catch (err) {
       alert('Erro ao deletar cifra: ' + err.message);
     } finally {
@@ -136,42 +137,53 @@ const CifraDetalhe = ({ onDelete }) => {
   const handleEditar = () => navigate('/edit-cifra/' + cifra.id);
 
   if (loading || authLoading) return <p>Carregando...</p>;
-  if (error) return <div><p>{error}</p><Link to="/">← Voltar para Home</Link></div>;
+  if (error) return <div><p>{error}</p><Link to="/home2">← Voltar para Home</Link></div>;
 
   const cifraLines = (cifra?.cifra || '').split('\n');
 
   return (
     <div className="cifra-container">
       <h2>{cifra.musica} - {cifra.artista}</h2>
+      <p>Visualizações: {views}</p>
 
+      {/* Transpose */}
       <div className="transpose-buttons">
         <button onClick={() => setTransposeSteps(s => (s - 1 + NOTES.length) % NOTES.length)}>-</button>
         <span>Tom</span>
         <button onClick={() => setTransposeSteps(s => (s + 1) % NOTES.length)}>+</button>
       </div>
 
-      <div>
+      {/* Cifra formatada */}
+      <div className="cifra-text">
         {cifraLines.map((line, idx) => (
           <div key={idx}>
-            {highlightChords(line, transposeSteps).map((part, i) =>
+            {highlightChords(line, transposeSteps).map((part, i) => (
               <span key={i} style={{ fontWeight: part.isChord ? 'bold' : 'normal' }}>
                 {part.text}
               </span>
-            )}
+            ))}
           </div>
         ))}
       </div>
 
-      {user && <button onClick={toggleFavorite}>{isFavorite ? '★ Favorito' : '☆ Favoritar'}</button>}
+      {/* Favorito */}
+      {user && (
+        <button onClick={toggleFavorite} className="favorite-btn">
+          {isFavorite ? '★ Favorito' : '☆ Favoritar'}
+        </button>
+      )}
 
+      {/* Editar / Excluir */}
       {isMaster && (
-        <div>
+        <div className="admin-buttons">
           <button onClick={handleEditar}>Editar</button>
-          <button onClick={handleDelete} disabled={deleting}>{deleting ? 'Excluindo...' : 'Excluir'}</button>
+          <button onClick={handleDelete} disabled={deleting}>
+            {deleting ? 'Excluindo...' : 'Excluir'}
+          </button>
         </div>
       )}
 
-      <Link to="/">← Voltar para Home</Link>
+      <Link to="/home2">← Voltar para Home</Link>
     </div>
   );
 };

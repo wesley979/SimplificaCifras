@@ -2,99 +2,107 @@
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
-  background-color: #000; /* fundo preto */
+  background-color: #fdfdfd; /* fundo branco */
   min-height: 100vh;
-  color: #fff;
-}
-
-.back-btn {
-  background-color: #6a0dad; /* roxo */
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 10px 15px;
-  cursor: pointer;
-  font-size: 1rem;
-  margin-bottom: 20px;
-  transition: background 0.2s;
-}
-
-.back-btn:hover {
-  background-color: #7e2ee3;
+  color: #222; /* texto principal preto */
+  font-family: 'Arial', sans-serif;
 }
 
 .cifras-genero h2 {
-  margin-bottom: 20px;
+  text-align: center;
   font-size: 28px;
-  text-align: center;
-}
-
-.no-cifras {
-  text-align: center;
-  color: #ccc;
-  margin-top: 20px;
-  font-size: 16px;
+  margin-bottom: 25px;
+  color: #6a0dad; /* título roxo discreto */
 }
 
 .cifras-list {
   display: flex;
-  flex-direction: column;
-  gap: 15px;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
 }
 
 .cifra-card {
-  background: #1a1a1a;
-  color: #fff;
-  padding: 15px;
-  border-radius: 10px;
+  background-color: #fff; /* card branco */
+  color: #222; /* texto preto */
+  width: 260px;
+  padding: 18px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .cifra-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(106, 13, 173, 0.5); /* sombra roxa */
-  background: #1f0d2a; /* leve roxo escuro */
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
 }
 
-
 .cifra-card h4 {
-  margin: 0 0 5px 0;
   font-size: 18px;
   font-weight: 600;
+  margin-bottom: 6px;
 }
 
 .cifra-card p {
-  margin: 0;
   font-size: 14px;
-  color: #aaa;
+  color: #555; /* artista cinza escuro */
+  margin-bottom: 12px;
 }
 
-.loading-text {
+/* Views no rodapé do card */
+.cifra-card .views {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  font-size: 13px;
+  color: #555;
+}
+
+.cifra-card .views i {
+  color: #6a0dad; /* olho roxo discreto */
+}
+
+/* Mensagem de nenhuma cifra */
+.no-cifras {
   text-align: center;
-  color: #ccc;
-  margin-top: 50px;
+  color: #555;
   font-size: 16px;
+  margin-top: 20px;
 }
 
 /* Responsividade */
 @media (max-width: 768px) {
+  .cifra-card {
+    width: 45%;
+    padding: 15px;
+  }
+
   .cifra-card h4 {
     font-size: 16px;
   }
 
-  .cifra-card p {
+  .cifra-card p,
+  .cifra-card .views {
     font-size: 12px;
-  }
-
-  .back-btn {
-    font-size: 0.9rem;
-    padding: 8px 12px;
   }
 }
 
 @media (max-width: 480px) {
-  .cifras-genero h2 {
-    font-size: 22px;
+  .cifra-card {
+    width: 100%;
+  }
+
+  .cifra-card h4 {
+    font-size: 14px;
+  }
+
+  .cifra-card p,
+  .cifra-card .views {
+    font-size: 11px;
   }
 }
