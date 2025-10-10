@@ -1,81 +1,251 @@
-.header {
-  background: #1e1e1e;
-  padding: 10px 20px;
+/* ================= Navbar fixa (tema dark #111) ================= */
+:root {
+  --nav-bg: #111;
+  --nav-text: #fff;
+  --nav-muted: rgba(255,255,255,0.88);
+  --nav-border: rgba(167,139,250,0.25);
+  --accent: #a78bfa;
+  --accent-hover: #7c3aed;
 }
 
-.header-inner {
+/* Container fixo no topo */
+.navbar,
+.header { /* suporte ao nome antigo .header */
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 64px;
+  background: var(--nav-bg);
+  color: var(--nav-text);
+  border-bottom: 1px solid var(--nav-border);
+  z-index: 1000;
+  backdrop-filter: saturate(120%) blur(6px);
+  padding: 0; /* removendo padding para altura consistente */
+}
+
+/* Conteúdo centralizado */
+.nav-inner,
+.header-inner { /* suporte ao nome antigo */
+  height: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
   display: flex;
-  justify-content: space-between; /* título à esquerda, menu/botão à direita */
   align-items: center;
-  width: 100%;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-.site-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #ffffff;
+/* Marca / Título do site - sem ícone, tipografia mais forte */
+.brand,
+.site-title { /* suporte ao link antigo */
+  display: inline-flex;
+  align-items: center;
+  gap: 0;                   /* sem espaço para ícone */
+  font-weight: 800;         /* mais destaque */
+  font-size: 22px;          /* um pouco maior */
+  letter-spacing: -0.3px;   /* leve compactação */
+  color: var(--nav-text);
   text-decoration: none;
+  line-height: 1;
 }
 
-.desktop-nav,
-.mobile-nav {
+/* Não usamos mais o brand-icon, mas deixo aqui sem efeito caso exista em cache */
+.brand-icon { display: none; }
+
+.brand-name { 
+  color: var(--nav-text);
+}
+
+/* Ações (desktop) à direita */
+.nav-actions,
+.desktop-nav { /* suporte ao nome antigo */
   display: flex;
-  flex-direction: row;
+  align-items: center;
   gap: 10px;
 }
 
+.nav-link,
 .nav-button,
 .logout-button {
-  color: #f0f0f0;
-  background: transparent;
-  border: 1px solid #f0f0f0;
-  padding: 5px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  text-decoration: none;
-  font-size: 1rem;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: transparent;
+  color: var(--nav-muted);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .18s ease, border-color .18s ease, color .18s ease, transform .12s ease;
 }
 
+.nav-link:hover,
 .nav-button:hover,
 .logout-button:hover {
-  background: #f0f0f0;
-  color: #1e1e1e;
+  background: rgba(167,139,250,0.12);
+  border-color: rgba(167,139,250,0.45);
+  color: #fff;
+  transform: translateY(-1px);
 }
 
-.user-greeting {
-  color: #f0f0f0;
-  font-size: 1rem;
-  margin-bottom: 5px; /* distancia do texto para os botões */
-  margin-top: 5px;    /* desce um pouquinho para alinhar melhor */
+/* Botão de destaque (Login / Adicionar) */
+.nav-button.primary {
+  border-color: rgba(167,139,250,0.6);
+  color: #fff;
+  background: rgba(167,139,250,0.08);
+}
+.nav-button.primary:hover {
+  background: rgba(167,139,250,0.18);
 }
 
-.hamburger {
-  font-size: 1.8rem;
-  background: none;
-  border: none;
-  color: #ffffff;
-  cursor: pointer;
+/* Área do usuário */
+.user-area {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.user-avatar {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+.user-name,
+.user-greeting { /* suporte ao nome antigo */
+  color: var(--nav-muted);
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
 }
 
-.mobile-menu-container {
+/* Mobile */
+.mobile-area,
+.mobile-menu-container { /* suporte ao nome antigo */
   position: relative;
 }
 
-.mobile-nav {
+.menu-toggle,
+.hamburger { /* suporte ao nome antigo */
   display: none;
-  position: absolute;
-  top: 40px;
-  right: 0;
-  background: #2a2a2a;
-  padding: 10px;
-  border-radius: 8px;
-  flex-direction: column;
-  gap: 10px;
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: transparent;
+  color: var(--nav-text);
+  font-size: 20px;
+  cursor: pointer;
+  align-items: center; justify-content: center;
+  transition: background .18s, border-color .18s;
+}
+.menu-toggle:hover,
+.hamburger:hover {
+  background: rgba(167,139,250,0.12);
+  border-color: rgba(167,139,250,0.45);
 }
 
+/* Dropdown mobile */
+.nav-menu,
+.mobile-nav { /* suporte ao nome antigo */
+  display: none;
+  position: absolute;
+  top: 64px; right: 12px;
+  background: #141414;
+  border: 1px solid rgba(167,139,250,0.25);
+  border-radius: 12px;
+  padding: 8px;
+  min-width: 200px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nav-menu.open,
 .mobile-nav.open {
   display: flex;
 }
+
+.nav-menu a,
+.nav-menu button,
+.mobile-nav a,
+.mobile-nav button,
+.nav-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: transparent;
+  border: none;
+  color: var(--nav-muted);
+  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background .15s, color .15s;
+}
+.nav-menu a:hover,
+.nav-menu button:hover,
+.mobile-nav a:hover,
+.mobile-nav button:hover,
+.nav-menu-item:hover {
+  background: rgba(167,139,250,0.12);
+  color: #fff;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .nav-actions,
+  .desktop-nav {
+    display: none;
+  }
+  .menu-toggle,
+  .hamburger {
+    display: inline-flex;
+  }
+
+  /* Marca ligeiramente menor em telas pequenas */
+  .brand,
+  .site-title {
+    font-size: 20px;
+    letter-spacing: -0.25px;
+  }
+}
+
+/* Utilitário: adicione no wrapper de páginas com Header para compensar a barra fixa */
+.app-with-fixed-navbar {
+  padding-top: 64px;
+}
+
+/* Reforços de layout da barra (garantem marca à esquerda e ações à direita) */
+.nav-inner {
+  justify-content: space-between !important;
+}
+
+.brand {
+  flex: 0 0 auto;   /* não crescer nem encolher, tamanho do conteúdo */
+  min-width: 0;      /* evita quebra estranha se o nome for grande */
+}
+
+/* Desktop: ações à direita */
+.nav-actions {
+  margin-left: auto; /* empurra explicitamente para a direita */
+  flex: 0 0 auto;
+}
+
+/* Mobile: também empurrar a área mobile para a direita */
+.mobile-area {
+  margin-left: auto;         /* ESSENCIAL: separa da brand */
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Reforço caso algum reset tenha centralizado o header */
+.navbar { text-align: initial; }

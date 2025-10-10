@@ -1,25 +1,59 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import './Header.css';
 
 const Header = () => {
-  const { user, isMaster, logout, loading } = useAuth(); // pegando loading
+  const { user, isMaster, logout, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
   const [animateKey, setAnimateKey] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
+
+  // Usa matchMedia para determinar mobile de forma robusta
+  const mq = typeof window !== 'undefined'
+    ? window.matchMedia('(max-width: 820px)')
+    : { matches: false, addEventListener: () => {}, removeEventListener: () => {} };
+
+  const [isMobile, setIsMobile] = useState(mq.matches);
+
+  const menuRef = useRef(null);
 
   useEffect(() => {
     setAnimateKey(prev => prev + 1);
+    // fecha menu ao navegar
+    setMobileMenuOpen(false);
   }, [location.pathname]);
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 600);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    const handler = (e) => setIsMobile(e.matches);
+    // Compatibilidade com navegadores antigos
+    if (mq.addEventListener) {
+      mq.addEventListener('change', handler);
+    } else if (mq.addListener) {
+      mq.addListener(handler);
+    }
+    return () => {
+      if (mq.removeEventListener) {
+        mq.removeEventListener('change', handler);
+      } else if (mq.removeListener) {
+        mq.removeListener(handler);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // fecha dropdown ao clicar fora
+  useEffect(() => {
+    const onClickOutside = (e) => {
+      if (mobileMenuOpen && menuRef.current && !menuRef.current.contains(e.target)) {
+        setMobileMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', onClickOutside);
+    return () => document.removeEventListener('mousedown', onClickOutside);
+  }, [mobileMenuOpen]);
 
   const handleLogout = async () => {
     try {
@@ -30,84 +64,101 @@ const Header = () => {
     }
   };
 
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(prev => !prev);
-    if (!mobileMenuOpen) {
-      setTimeout(() => setMobileMenuOpen(false), 5000);
-    }
-  };
+  const toggleMobileMenu = () => setMobileMenuOpen(prev => !prev);
 
-  // Função para mostrar saudação apenas quando não estiver carregando
   const renderUserGreeting = () => {
-    if (loading || !user) return null; // enquanto carrega ou não tem user, não mostra nada
-    return <span className="user-greeting">Olá, {user.displayName || user.email}</span>;
+    if (loading || !user) return null;
+    const name = user.displayName || user.email || 'Usuário';
+    return <span className="user-name">Olá, {name}</span>;
   };
 
   return (
-    <header className="header">
-      <div className="header-inner">
-        {/* Título */}
-        <Link to="/" className="site-title" key={animateKey}>
-          Simplifica Cifras
+    <header className="navbar">
+      <div className="nav-inner">
+        {/* Marca - esquerda (sem ícone musical) */}
+        <Link to="/home2" className="brand" key={animateKey} aria-label="Ir para home">
+          <span className="brand-name">Simplifica Cifras</span>
         </Link>
 
-        {/* Desktop navigation */}
+        {/* Ações desktop - direita */}
         {!isMobile && (
-          <nav className="desktop-nav">
+          <nav className="nav-actions right-actions" aria-label="Navegação principal">
             {user ? (
               <>
-                {renderUserGreeting()}
-                <Link to="/favoritos" className="nav-button">Favoritos</Link>
-                {isMaster && <Link to="/add-cifra" className="nav-button">Adicionar Cifra</Link>}
-                <button className="logout-button" onClick={handleLogout}>Sair</button>
+                <div className="user-area">
+                  {user.photoURL ? (
+                    <img
+                      src={user.photoURL}
+                      alt="Avatar"
+                      className="user-avatar"
+                      width={24}
+                      height={24}
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : null}
+                  {renderUserGreeting()}
+                </div>
+                <Link to="/favoritos" className="nav-link">Favoritos</Link>
+                {isMaster && <Link to="/add-cifra" className="nav-button primary">Adicionar Cifra</Link>}
+                <button className="nav-button" onClick={handleLogout}>Sair</button>
               </>
             ) : (
-              <Link to="/login" className="nav-button">Login</Link>
+              <Link to="/login" className="nav-button primary">Login</Link>
             )}
           </nav>
         )}
 
-        {/* Mobile hamburger */}
+        {/* Mobile: hambúrguer */}
         {isMobile && (
-          <div className="mobile-menu-container">
-            <button className="hamburger" onClick={toggleMobileMenu}>☰</button>
-            <nav className={`mobile-nav ${mobileMenuOpen ? 'open' : ''}`}>
+          <div className="mobile-area" ref={menuRef}>
+            <button
+              className="menu-toggle"
+              aria-label="Abrir menu"
+              aria-expanded={mobileMenuOpen}
+              onClick={toggleMobileMenu}
+            >
+              ☰
+            </button>
+            <div className={`nav-menu ${mobileMenuOpen ? 'open' : ''}`} role="menu">
               {user ? (
                 <>
-                  {renderUserGreeting()}
-                  <Link 
-                    to="/favoritos" 
-                    className="nav-button" 
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
+                  <div className="user-area" style={{ padding: '6px 10px' }}>
+                    {user.photoURL ? (
+                      <img
+                        src={user.photoURL}
+                        alt="Avatar"
+                        className="user-avatar"
+                        width={24}
+                        height={24}
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : null}
+                    {renderUserGreeting()}
+                  </div>
+                  <Link to="/favoritos" className="nav-menu-item" onClick={() => setMobileMenuOpen(false)}>
                     Favoritos
                   </Link>
                   {isMaster && (
-                    <Link 
-                      to="/add-cifra" 
-                      className="nav-button" 
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
+                    <Link to="/add-cifra" className="nav-menu-item" onClick={() => setMobileMenuOpen(false)}>
                       Adicionar Cifra
                     </Link>
                   )}
-                  <button 
-                    className="logout-button" 
-                    onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
+                  <button
+                    className="nav-menu-item"
+                    onClick={() => {
+                      handleLogout();
+                      setMobileMenuOpen(false);
+                    }}
                   >
                     Sair
                   </button>
                 </>
               ) : (
-                <Link 
-                  to="/login" 
-                  className="nav-button" 
-                  onClick={() => setMobileMenuOpen(false)}
-                >
+                <Link to="/login" className="nav-menu-item" onClick={() => setMobileMenuOpen(false)}>
                   Login
                 </Link>
               )}
-            </nav>
+            </div>
           </div>
         )}
       </div>

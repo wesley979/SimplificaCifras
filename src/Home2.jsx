@@ -27,7 +27,6 @@ export default function Home2() {
     { title: 'Cifras Disponíveis', value: '12.847', desc: 'E crescendo todos os dias' },
     { title: 'Usuários Ativos', value: '89.234', desc: 'Músicos de todo o Brasil' },
     { title: 'Cifras Tocadas', value: '2.1M', desc: 'No último mês' },
-    { title: 'Avaliação', value: '4.8★', desc: 'Nas lojas de aplicativos' },
   ]);
 
   const masterEmails = ['lais@gmail.com'];
@@ -94,8 +93,8 @@ export default function Home2() {
       {/* Header */}
       <header className="home2-header">
         <div className="header-left">
-          <div className="logo">🎵</div>
-          <div className="title">SimplificaCifras</div>
+          <div className="logo"></div>
+          <div className="title">Simplifica Cifras</div>
         </div>
 
         {/* Desktop menu */}
@@ -168,7 +167,7 @@ export default function Home2() {
         <h2>
           Sua música, <span>nossa paixão</span>
         </h2>
-        <p>Descubra, aprenda e toque suas músicas favoritas</p>
+        <p>Descubra e toque suas músicas favoritas</p>
 
         <div className="search-box">
           <input

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 
 // ===================
 // Componentes
@@ -27,7 +27,9 @@ import { db, doc, deleteDoc, collection, getDocs } from './firebase';
 
 import './App.css';
 
-function App() {
+function AppContent() {
+  const location = useLocation();
+  
   // -----------------------
   // Estados principais
   // -----------------------
@@ -77,67 +79,60 @@ function App() {
     cifra.artista?.toLowerCase().includes(debouncedTerm.toLowerCase())
   );
 
+  // -----------------------
+  // Controle de exibição do Header
+  // -----------------------
+  const showHeader = location.pathname.startsWith('/cifras/detalhe/');
+
+  return (
+    <>
+      {showHeader && <Header />}
+      
+      <Routes>
+        {/* Página principal */}
+        <Route path="/" element={<Home2 />} />
+        <Route path="/home2" element={<Home2 />} />
+
+        {/* Detalhe de cifra com /detalhe/:id */}
+        <Route
+          path="/cifras/detalhe/:slugOrId"
+          element={<CifraDetalhe cifras={cifras} onDelete={handleDelete} />}
+        />
+
+        {/* Adicionar nova cifra */}
+        <Route
+          path="/add-cifra"
+          element={<AddCifra setCifras={setCifras} cifras={cifras} />}
+        />
+
+        {/* Editar cifra existente */}
+        <Route
+          path="/edit-cifra/:id"
+          element={<AddCifra setCifras={setCifras} cifras={cifras} />}
+        />
+
+        {/* Favoritos */}
+        <Route
+          path="/favoritos"
+          element={<Favoritos />}
+        />
+
+        {/* Login e Registro */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+
+        {/* Página de gênero */}
+        <Route path="/genero/:genero" element={<CifraGenero />} />
+      </Routes>
+    </>
+  );
+}
+
+function App() {
   return (
     <AuthProvider>
       <Router>
-        <Routes>
-
-          {/* Página principal */}
-          <Route path="/" element={<Home2 />} />
-          <Route path="/home2" element={<Home2 />} />
-
-          {/* Detalhe de cifra com /detalhe/:id */}
-          <Route
-            path="/cifras/detalhe/:slugOrId"
-            element={
-              <>
-                <Header />
-                <CifraDetalhe cifras={cifras} onDelete={handleDelete} />
-              </>
-            }
-          />
-
-          {/* Adicionar nova cifra */}
-          <Route
-            path="/add-cifra"
-            element={
-              <>
-                <Header />
-                <AddCifra setCifras={setCifras} cifras={cifras} />
-              </>
-            }
-          />
-
-          {/* Editar cifra existente */}
-          <Route
-            path="/edit-cifra/:id"
-            element={
-              <>
-                <Header />
-                <AddCifra setCifras={setCifras} cifras={cifras} />
-              </>
-            }
-          />
-
-          {/* Favoritos */}
-          <Route
-            path="/favoritos"
-            element={
-              <>
-                <Header />
-                <Favoritos />
-              </>
-            }
-          />
-
-          {/* Login e Registro */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-
-          {/* Página de gênero */}
-          <Route path="/genero/:genero" element={<CifraGenero />} />
-
-        </Routes>
+        <AppContent />
       </Router>
     </AuthProvider>
   );
