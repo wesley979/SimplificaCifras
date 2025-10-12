@@ -15,7 +15,7 @@ html, body, #root {
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
   margin: 0;
   padding: 0;
-  overflow-x: hidden; /* evita scroll lateral global (mantemos proteção) */
+  overflow-x: hidden; /* evita scroll lateral global */
 }
 
 /* Container sem "folha"/card + respiro para barra fixa */
@@ -23,7 +23,7 @@ html, body, #root {
   max-width: 900px;
   margin: 24px auto 96px;
   padding: 64px 20px 0; /* compensa a barra fixa */
-  padding-left: 56px;   /* gutter geral (título, controles e cifras) */
+  padding-left: 56px;   /* gutter geral (título, controles e cifras) no desktop */
   background: transparent;
   position: relative;
   color: var(--text);
@@ -31,7 +31,7 @@ html, body, #root {
   box-shadow: none;
 }
 
-/* Título limpo (sem caixa/fundo) */
+/* Título */
 .cifra-header {
   text-align: left;     /* alinha com o gutter do container */
   margin: 28px 0 12px;
@@ -57,10 +57,10 @@ html, body, #root {
   margin-left: 4px;
 }
 
-/* Transposição discreta */
+/* Transposição */
 .transpose-row {
   display: flex;
-  justify-content: flex-start;  /* segue alinhamento do container */
+  justify-content: flex-start;
   align-items: center;
   gap: 10px;
   margin: 14px 0 22px;
@@ -88,14 +88,14 @@ html, body, #root {
   font-size: 13px;
 }
 
-/* Cifra "flutuando" no branco */
+/* Cifra */
 .cifra-text {
   white-space: pre; /* mantém alinhamento por espaços */
   font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 16px;
   line-height: 1.85;
   margin-bottom: 24px;
-  overflow-x: auto; /* em telas grandes só aparece se preciso */
+  overflow-x: auto; /* aparece só se realmente precisar em telas grandes */
   tab-size: 4;
   /* sem padding-left no desktop; gutter vem do container */
 }
@@ -106,18 +106,18 @@ html, body, #root {
   color: var(--accent);
   font-weight: 700;
   margin-right: 1px;
-  line-height: 1.05;    /* cola com a linha de baixo */
-  margin-bottom: -4px;  /* aproxima da letra */
+  line-height: 1.05;     /* cola com a linha de baixo */
+  margin-bottom: -4px;   /* aproxima da letra */
   transform: translateY(1px); /* microajuste ótico (0~2px) */
 }
 
 .part.lyric {
   color: var(--text);
-  line-height: 1.35;  /* gap do par linha acorde + letra */
+  line-height: 1.35;     /* gap do par acorde+letra */
   margin: 0;
 }
 
-/* Rodapé harmonioso e centralizado */
+/* Rodapé */
 .cifra-footer {
   display: flex;
   justify-content: center;
@@ -139,7 +139,7 @@ html, body, #root {
   background: #fff;
 }
 
-/* "Voltar" como botão-link discreto */
+/* "Voltar" */
 .back-link {
   color: var(--text);
   font-weight: 600;
@@ -154,14 +154,13 @@ html, body, #root {
   border-color: #ddd;
 }
 
-/* Botões admin mantidos */
+/* Admin */
 .admin-buttons-bottom {
   display: flex;
   justify-content: center;
   gap: 10px;
   margin-top: 12px;
 }
-
 .edit-btn,
 .delete-btn {
   background: var(--accent);
@@ -176,14 +175,14 @@ html, body, #root {
 .edit-btn:hover,
 .delete-btn:hover { background: #7c3aed; }
 
-/* Loading message */
+/* Loading */
 .loading-message {
   text-align: center;
   padding: 80px 20px;
   color: var(--muted);
 }
 
-/* Responsividade + proteção anti “comer à esquerda” no mobile */
+/* Tablet */
 @media (max-width: 768px) {
   .cifra-title { font-size: 24px; }
 
@@ -202,6 +201,7 @@ html, body, #root {
   .part.lyric { line-height: 1.3; }
 }
 
+/* iPhone / telas estreitas */
 @media (max-width: 480px) {
   .cifra-title { font-size: 22px; }
 
@@ -210,11 +210,17 @@ html, body, #root {
   }
 
   .cifra-text {
-    font-size: 13px;     /* evita scroll lateral */
-    tab-size: 2;         /* tabs menores no mobile */
-    padding-left: 12px;  /* respiro interno para não “comer” a esquerda */
+    font-size: 12px;     /* menor para caber sem scroll lateral */
+    line-height: 1.26;   /* compacto, mas legível */
+    tab-size: 2;         /* tabs mínimas no mobile */
+    padding-left: 14px;  /* respiro interno garante que não “coma” a esquerda */
   }
 
-  .part.chord { margin-bottom: -2px; }
-  .part.lyric { line-height: 1.28; }
+  .part.chord {
+    margin-bottom: -2px;
+    transform: translateY(0);  /* evita microdeslocamento em zoom do iOS */
+    line-height: 1.06;
+  }
+
+  .part.lyric { line-height: 1.26; }
 }
