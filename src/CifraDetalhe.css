@@ -15,17 +15,16 @@ html, body, #root {
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
   margin: 0;
   padding: 0;
-  overflow-x: hidden; /* evita scroll lateral global */
+  overflow-x: hidden; /* evita scroll lateral global (mantemos proteção) */
 }
 
 /* Container sem "folha"/card + respiro para barra fixa */
 .cifra-container {
   max-width: 900px;
   margin: 24px auto 96px;
-  padding: 64px 20px 0; /* padding-top de 64px para compensar a barra fixa */
-  padding-left: 56px;   /* gutter geral à esquerda (título, controles e cifras) */
+  padding: 64px 20px 0; /* compensa a barra fixa */
+  padding-left: 56px;   /* gutter geral (título, controles e cifras) */
   background: transparent;
-  min-height: auto;
   position: relative;
   color: var(--text);
   border-radius: 0;
@@ -34,7 +33,7 @@ html, body, #root {
 
 /* Título limpo (sem caixa/fundo) */
 .cifra-header {
-  text-align: left;          /* alinha com o gutter do container */
+  text-align: left;     /* alinha com o gutter do container */
   margin: 28px 0 12px;
   background: transparent !important;
   border: none !important;
@@ -61,7 +60,7 @@ html, body, #root {
 /* Transposição discreta */
 .transpose-row {
   display: flex;
-  justify-content: flex-start;  /* segue alinhamento à esquerda do container */
+  justify-content: flex-start;  /* segue alinhamento do container */
   align-items: center;
   gap: 10px;
   margin: 14px 0 22px;
@@ -91,14 +90,14 @@ html, body, #root {
 
 /* Cifra "flutuando" no branco */
 .cifra-text {
-  white-space: pre; /* mantém alinhamento original */
+  white-space: pre; /* mantém alinhamento por espaços */
   font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 16px;
   line-height: 1.85;
   margin-bottom: 24px;
-  overflow-x: auto; /* garante scroll horizontal se realmente necessário em telas grandes */
+  overflow-x: auto; /* em telas grandes só aparece se preciso */
   tab-size: 4;
-  /* sem padding-left aqui: o gutter agora vem do container */
+  /* sem padding-left no desktop; gutter vem do container */
 }
 
 .cifra-line { margin: 0; }
@@ -107,14 +106,14 @@ html, body, #root {
   color: var(--accent);
   font-weight: 700;
   margin-right: 1px;
-  line-height: 1.05;    /* reduz a altura da linha de acorde */
-  margin-bottom: -4px;  /* cola na letra de baixo */
+  line-height: 1.05;    /* cola com a linha de baixo */
+  margin-bottom: -4px;  /* aproxima da letra */
   transform: translateY(1px); /* microajuste ótico (0~2px) */
 }
 
 .part.lyric {
   color: var(--text);
-  line-height: 1.35;  /* um pouco mais enxuto para diminuir o gap do par */
+  line-height: 1.35;  /* gap do par linha acorde + letra */
   margin: 0;
 }
 
@@ -184,7 +183,7 @@ html, body, #root {
   color: var(--muted);
 }
 
-/* Responsividade */
+/* Responsividade + proteção anti “comer à esquerda” no mobile */
 @media (max-width: 768px) {
   .cifra-title { font-size: 24px; }
 
@@ -194,7 +193,8 @@ html, body, #root {
 
   .cifra-text {
     font-size: 14px;
-    tab-size: 3;         /* tabs menores para caber sem overflow */
+    tab-size: 3;
+    padding-left: 14px;  /* respiro interno no bloco rolável */
   }
 
   .transpose-row { justify-content: flex-start; }
@@ -206,12 +206,13 @@ html, body, #root {
   .cifra-title { font-size: 22px; }
 
   .cifra-container {
-    padding-left: 14px;  /* gutter compacto no celular */
+    padding-left: 14px;  /* gutter compacto */
   }
 
   .cifra-text {
-    font-size: 13px;     /* reduz a tipografia para evitar scroll lateral */
-    tab-size: 2;         /* tabs bem compactas no mobile */
+    font-size: 13px;     /* evita scroll lateral */
+    tab-size: 2;         /* tabs menores no mobile */
+    padding-left: 12px;  /* respiro interno para não “comer” a esquerda */
   }
 
   .part.chord { margin-bottom: -2px; }
