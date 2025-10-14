@@ -61,6 +61,18 @@ html, body, #root {
   margin-left: 4px;
 }
 
+/* --------------------------------------------
+   (Opcional) Topline: Transpose etc.
+   Mantido caso você use depois; não necessário para o views no rodapé
+--------------------------------------------- */
+.topline{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 14px 0 22px;
+}
+
 /* Transposição */
 .transpose-row {
   display: flex;
@@ -69,7 +81,6 @@ html, body, #root {
   gap: 10px;
   margin: 14px 0 22px;
 }
-
 .transpose-btn {
   background: #fff;
   color: var(--text);
@@ -79,13 +90,11 @@ html, body, #root {
   cursor: pointer;
   font-size: 14px;
   transition: background 0.15s ease, border-color 0.15s ease;
-  /* Removido transform do hover para evitar stacking context */
 }
 .transpose-btn:hover {
   background: #f7f7f7;
   border-color: #ddd;
 }
-
 .transpose-label {
   font-weight: 600;
   color: var(--muted);
@@ -103,25 +112,19 @@ html, body, #root {
   word-break: normal; /* não quebra palavras, só em espaços */
   overflow-wrap: normal;
   -webkit-text-size-adjust: 100%;
-  /* Removido overflow-x: auto — só scroll vertical do documento */
 }
 
 .cifra-line { 
   margin: 0;
-  /* Sem transforms ou positioning que criem stacking context */
 }
 
-/* Acordes e letras - SEM transforms ou margens negativas */
+/* Acordes e letras */
 .part.chord {
   color: var(--accent);
   font-weight: 700;
-  /* Removidos: margin-bottom negativo e transform */
-  /* Alinhamento vem apenas de line-height */
 }
-
 .part.lyric {
   color: var(--text);
-  /* line-height consistente com o bloco pai */
 }
 
 /* Rodapé */
@@ -135,15 +138,35 @@ html, body, #root {
   padding: 0 20px;
 }
 
-.views-label {
+/* Views no rodapé: só o ícone (sem bolinha/borda/fundo) */
+.cifra-footer .views-label{
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 6px;             /* espaço entre ícone e número (se tiver) */
   color: var(--muted);
-  border: 1px solid var(--border);
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: #fff;
+  line-height: 1;
+}
+
+/* Ícone de olho no rodapé */
+.cifra-footer .views-label svg{
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+/* Número de views ao lado (se existir .count) */
+.cifra-footer .views-label .count{
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Hover sutil (opcional) */
+.cifra-footer .views-label:hover{
+  color: var(--text);
 }
 
 /* "Voltar" */
@@ -220,6 +243,5 @@ html, body, #root {
     font-size: 13px;     /* tamanho que cabe sem scroll lateral */
     line-height: 1.6;    /* compacto, mas legível */
     tab-size: 2;
-    /* white-space: pre-wrap já definido acima, permite quebra rara */
   }
 }

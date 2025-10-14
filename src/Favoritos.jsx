@@ -7,6 +7,7 @@ export default function Favoritos() {
   const { user, loading: authLoading } = useAuth();
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -17,23 +18,33 @@ export default function Favoritos() {
       }
 
       setLoading(true);
+      setErrorMsg('');
+
       try {
-        // Pega os favoritos do usuário
+        // Pega os favoritos do usuário (cada item deve ter fav.cifraId)
         const favDocs = await getFavorites(user.uid);
 
-        // Busca os detalhes de cada cifra
+        // Busca os detalhes de cada cifra favorita
         const cifrasPromises = favDocs.map(async (fav) => {
-          const cifraDoc = await getDoc(doc(db, 'cifras', fav.cifraId));
-          if (cifraDoc.exists()) {
-            return { id: cifraDoc.id, ...cifraDoc.data() };
+          if (!fav?.cifraId) return null;
+          try {
+            const cifraRef = doc(db, 'cifras', fav.cifraId);
+            const cifraDoc = await getDoc(cifraRef);
+            if (cifraDoc.exists()) {
+              return { id: cifraDoc.id, ...cifraDoc.data() };
+            }
+            return null;
+          } catch (e) {
+            console.error('Erro ao buscar cifra favorita:', e);
+            return null;
           }
-          return null;
         });
 
         const cifras = await Promise.all(cifrasPromises);
-        setFavorites(cifras.filter(c => c !== null));
+        setFavorites(cifras.filter((c) => c !== null));
       } catch (err) {
-        console.error('Erro ao buscar favoritos:', err.message);
+        console.error('Erro ao buscar favoritos:', err);
+        setErrorMsg('Não foi possível carregar seus favoritos agora. Tente novamente em instantes.');
       } finally {
         setLoading(false);
       }
@@ -42,15 +53,15 @@ export default function Favoritos() {
     fetchFavorites();
   }, [user]);
 
-  // Função para remover favorito direto da lista
+  // Remover favorito direto da lista
   const handleRemoveFavorite = async (cifraId) => {
-    if (!user) return;
+    if (!user || !cifraId) return;
     try {
-      // Alterado para usar 'usuarios' internamente via firebase.js
       await removeFavorite(user.uid, cifraId);
-      setFavorites(prev => prev.filter(c => c.id !== cifraId));
+      setFavorites((prev) => prev.filter((c) => c.id !== cifraId));
     } catch (err) {
-      console.error('Erro ao remover favorito:', err.message);
+      console.error('Erro ao remover favorito:', err);
+      alert('Não foi possível remover. Tente novamente.');
     }
   };
 
@@ -60,6 +71,15 @@ export default function Favoritos() {
     return (
       <div style={{ textAlign: 'center', padding: '2rem' }}>
         <p>Você precisa estar logado para ver seus favoritos.</p>
+        <Link to="/">← Voltar para Home</Link>
+      </div>
+    );
+  }
+
+  if (errorMsg) {
+    return (
+      <div style={{ textAlign: 'center', padding: '2rem' }}>
+        <p>{errorMsg}</p>
         <Link to="/">← Voltar para Home</Link>
       </div>
     );
@@ -77,6 +97,7 @@ export default function Favoritos() {
   return (
     <section style={{ padding: '1rem', maxWidth: '700px', margin: '0 auto' }}>
       <h2 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>Meus Favoritos</h2>
+
       <ul style={{ listStyle: 'none', padding: 0 }}>
         {favorites.map((cifra) => (
           <li
@@ -90,24 +111,27 @@ export default function Favoritos() {
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
+              gap: '.75rem',
             }}
           >
             <Link
-              to={`/cifras/${cifra.id}`}
-              style={{ textDecoration: 'none', color: '#007acc', fontWeight: 'bold' }}
+              // CORREÇÃO: usar a rota do detalhe (/cifras/detalhe/:id)
+              to={`/cifras/detalhe/${cifra.id}`}
+              style={{ textDecoration: 'none', color: '#007acc', fontWeight: 'bold', flex: 1 }}
             >
-              {cifra.musica ?? 'Música sem nome'} - {cifra.artista ?? 'Artista desconhecido'}
+              {(cifra.musica ?? 'Música sem nome') + ' - ' + (cifra.artista ?? 'Artista desconhecido')}
             </Link>
+
             <button
               onClick={() => handleRemoveFavorite(cifra.id)}
               style={{
-                marginLeft: '1rem',
                 backgroundColor: '#ff4d4d',
                 color: '#fff',
                 border: 'none',
-                padding: '0.3rem 0.6rem',
-                borderRadius: '4px',
+                padding: '0.4rem 0.7rem',
+                borderRadius: '6px',
                 cursor: 'pointer',
+                whiteSpace: 'nowrap',
               }}
             >
               Remover
@@ -115,6 +139,7 @@ export default function Favoritos() {
           </li>
         ))}
       </ul>
+
       <div style={{ textAlign: 'center', marginTop: '2rem' }}>
         <Link to="/">← Voltar para Home</Link>
       </div>
