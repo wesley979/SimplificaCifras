@@ -6,25 +6,29 @@
   --nav-border: rgba(167,139,250,0.25);
   --accent: #a78bfa;
   --accent-hover: #7c3aed;
+  /* Altura estável da navbar para reuso */
+  --navbar-height: 64px;
 }
 
 /* Container fixo no topo */
 .navbar,
-.header { /* suporte ao nome antigo .header */
+.header {
   position: fixed;
   top: 0; left: 0; right: 0;
-  height: 64px;
+  height: var(--navbar-height);
   background: var(--nav-bg);
   color: var(--nav-text);
   border-bottom: 1px solid var(--nav-border);
   z-index: 1000;
-  backdrop-filter: saturate(120%) blur(6px);
-  padding: 0; /* removendo padding para altura consistente */
+  /* Removido backdrop-filter para evitar stacking context no iOS */
+  /* backdrop-filter: saturate(120%) blur(6px); */
+  padding: 0;
+  will-change: auto; /* evita promoted layers desnecessários */
 }
 
 /* Conteúdo centralizado */
 .nav-inner,
-.header-inner { /* suporte ao nome antigo */
+.header-inner {
   height: 100%;
   max-width: 1200px;
   margin: 0 auto;
@@ -35,30 +39,29 @@
   gap: 12px;
 }
 
-/* Marca / Título do site - sem ícone, tipografia mais forte */
+/* Marca / Título do site */
 .brand,
-.site-title { /* suporte ao link antigo */
+.site-title {
   display: inline-flex;
   align-items: center;
-  gap: 0;                   /* sem espaço para ícone */
-  font-weight: 800;         /* mais destaque */
-  font-size: 22px;          /* um pouco maior */
-  letter-spacing: -0.3px;   /* leve compactação */
+  gap: 0;
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: -0.3px;
   color: var(--nav-text);
   text-decoration: none;
   line-height: 1;
+  /* Evita aumento automático no iOS que mudaria a altura da barra */
+  -webkit-text-size-adjust: 100%;
 }
 
-/* Não usamos mais o brand-icon, mas deixo aqui sem efeito caso exista em cache */
+/* Não usamos mais o brand-icon */
 .brand-icon { display: none; }
-
-.brand-name { 
-  color: var(--nav-text);
-}
+.brand-name { color: var(--nav-text); }
 
 /* Ações (desktop) à direita */
 .nav-actions,
-.desktop-nav { /* suporte ao nome antigo */
+.desktop-nav {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -94,7 +97,7 @@
   transform: translateY(-1px);
 }
 
-/* Botão de destaque (Login / Adicionar) */
+/* Botão de destaque */
 .nav-button.primary {
   border-color: rgba(167,139,250,0.6);
   color: #fff;
@@ -117,7 +120,7 @@
   border: 1px solid rgba(255,255,255,0.2);
 }
 .user-name,
-.user-greeting { /* suporte ao nome antigo */
+.user-greeting {
   color: var(--nav-muted);
   font-size: 14px;
   font-weight: 600;
@@ -126,12 +129,10 @@
 
 /* Mobile */
 .mobile-area,
-.mobile-menu-container { /* suporte ao nome antigo */
-  position: relative;
-}
+.mobile-menu-container { position: relative; }
 
 .menu-toggle,
-.hamburger { /* suporte ao nome antigo */
+.hamburger {
   display: none;
   width: 36px; height: 36px;
   border-radius: 10px;
@@ -151,10 +152,11 @@
 
 /* Dropdown mobile */
 .nav-menu,
-.mobile-nav { /* suporte ao nome antigo */
+.mobile-nav {
   display: none;
   position: absolute;
-  top: 64px; right: 12px;
+  top: var(--navbar-height);
+  right: 12px;
   background: #141414;
   border: 1px solid rgba(167,139,250,0.25);
   border-radius: 12px;
@@ -164,11 +166,8 @@
   flex-direction: column;
   gap: 8px;
 }
-
 .nav-menu.open,
-.mobile-nav.open {
-  display: flex;
-}
+.mobile-nav.open { display: flex; }
 
 .nav-menu a,
 .nav-menu button,
@@ -203,15 +202,9 @@
 /* Responsividade */
 @media (max-width: 768px) {
   .nav-actions,
-  .desktop-nav {
-    display: none;
-  }
+  .desktop-nav { display: none; }
   .menu-toggle,
-  .hamburger {
-    display: inline-flex;
-  }
-
-  /* Marca ligeiramente menor em telas pequenas */
+  .hamburger { display: inline-flex; }
   .brand,
   .site-title {
     font-size: 20px;
@@ -219,33 +212,25 @@
   }
 }
 
-/* Utilitário: adicione no wrapper de páginas com Header para compensar a barra fixa */
+/* Wrapper de páginas com Header fixo:
+   Compensa a barra e considera safe-area no iPhone */
 .app-with-fixed-navbar {
-  padding-top: 64px;
+  padding-top: calc(var(--navbar-height) + env(safe-area-inset-top));
 }
 
-/* Reforços de layout da barra (garantem marca à esquerda e ações à direita) */
-.nav-inner {
-  justify-content: space-between !important;
-}
-
+/* Reforços de layout */
+.nav-inner { justify-content: space-between !important; }
 .brand {
-  flex: 0 0 auto;   /* não crescer nem encolher, tamanho do conteúdo */
-  min-width: 0;      /* evita quebra estranha se o nome for grande */
+  flex: 0 0 auto;
+  min-width: 0;
 }
-
-/* Desktop: ações à direita */
 .nav-actions {
-  margin-left: auto; /* empurra explicitamente para a direita */
+  margin-left: auto;
   flex: 0 0 auto;
 }
-
-/* Mobile: também empurrar a área mobile para a direita */
 .mobile-area {
-  margin-left: auto;         /* ESSENCIAL: separa da brand */
+  margin-left: auto;
   display: inline-flex;
   align-items: center;
 }
-
-/* Reforço caso algum reset tenha centralizado o header */
 .navbar { text-align: initial; }

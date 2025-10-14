@@ -25,8 +25,9 @@ function transposeChord(chord, steps) {
   return newRoot + suffix;
 }
 
+// Regex ligeiramente mais permissivo para sufixos de acorde comuns (maj7, m7b5, add9, sus4, etc.)
 const highlightChords = (line, transposeSteps) => {
-  const chordRegex = /\b([A-G][#b]?(?:m|maj|min|sus|dim|aug)?\d?(?:\/[A-G][#b]?)?)\b/g;
+  const chordRegex = /\b([A-G][#b]?(?:maj|min|m|dim|aug|sus|add)?\d*(?:\([^\)]*\))?(?:\/[A-G][#b]?)?)\b/g;
   const parts = [];
   let lastIndex = 0;
   let match;
@@ -79,7 +80,8 @@ const CifraDetalhe = ({ onDelete }) => {
         setCifra({ id: docSnap.id, ...data });
         setViews(data.views || 0);
 
-        await updateDoc(docRef, { views: increment(1) });
+        // incrementa views sem bloquear a renderização
+        updateDoc(docRef, { views: increment(1) }).catch(() => {});
         setViews(prev => prev + 1);
 
         if (user) {
@@ -88,7 +90,7 @@ const CifraDetalhe = ({ onDelete }) => {
           setIsFavorite(favSnap.exists());
         }
       } catch (err) {
-        setError('Erro ao buscar cifra: ' + err.message);
+        setError('Erro ao buscar cifra: ' + (err?.message || ''));
       } finally {
         setLoading(false);
       }
@@ -112,7 +114,7 @@ const CifraDetalhe = ({ onDelete }) => {
         setIsFavorite(true);
       }
     } catch (err) {
-      console.error('Erro ao atualizar favoritos:', err.message);
+      console.error('Erro ao atualizar favoritos:', err?.message || err);
     }
   };
 
@@ -123,7 +125,7 @@ const CifraDetalhe = ({ onDelete }) => {
       await onDelete(cifra.id);
       navigate('/home2');
     } catch (err) {
-      alert('Erro ao deletar cifra: ' + err.message);
+      alert('Erro ao deletar cifra: ' + (err?.message || ''));
     } finally {
       setDeleting(false);
     }
@@ -131,26 +133,30 @@ const CifraDetalhe = ({ onDelete }) => {
 
   const handleEditar = () => navigate('/edit-cifra/' + cifra.id);
 
-  if (loading || authLoading) return (
-    <>
-      <Header />
-      <main className="app-with-fixed-navbar">
-        <p className="loading-message">Carregando...</p>
-      </main>
-    </>
-  );
+  if (loading || authLoading) {
+    return (
+      <>
+        <Header />
+        <main className="app-with-fixed-navbar">
+          <p className="loading-message" aria-live="polite">Carregando...</p>
+        </main>
+      </>
+    );
+  }
 
-  if (error) return (
-    <>
-      <Header />
-      <main className="app-with-fixed-navbar">
-        <div className="cifra-container">
-          <p>{error}</p>
-          <Link to="/home2" className="back-link">← Voltar para Home</Link>
-        </div>
-      </main>
-    </>
-  );
+  if (error) {
+    return (
+      <>
+        <Header />
+        <main className="app-with-fixed-navbar">
+          <div className="cifra-container">
+            <p>{error}</p>
+            <Link to="/home2" className="back-link">← Voltar para Home</Link>
+          </div>
+        </main>
+      </>
+    );
+  }
 
   const cifraLines = (cifra?.cifra || '').split('\n');
 
@@ -161,17 +167,31 @@ const CifraDetalhe = ({ onDelete }) => {
         <div className="cifra-container">
           {/* Título */}
           <header className="cifra-header">
-            <h2 className="cifra-title">{cifra.musica} <span className="cifra-artist">- {cifra.artista}</span></h2>
+            <h2 className="cifra-title">
+              {cifra.musica} <span className="cifra-artist">- {cifra.artista}</span>
+            </h2>
           </header>
 
           {/* Transposição */}
-          <div className="transpose-row">
-            <button onClick={() => setTransposeSteps(s => (s - 1 + NOTES.length) % NOTES.length)} className="transpose-btn">-</button>
-            <span className="transpose-label">Tom</span>
-            <button onClick={() => setTransposeSteps(s => (s + 1) % NOTES.length)} className="transpose-btn">+</button>
+          <div className="transpose-row" role="group" aria-label="Transposição de tom">
+            <button
+              onClick={() => setTransposeSteps(s => (s - 1 + NOTES.length) % NOTES.length)}
+              className="transpose-btn"
+              aria-label="Diminuir tom"
+            >
+              -
+            </button>
+            <span className="transpose-label" aria-live="polite">Tom</span>
+            <button
+              onClick={() => setTransposeSteps(s => (s + 1) % NOTES.length)}
+              className="transpose-btn"
+              aria-label="Aumentar tom"
+            >
+              +
+            </button>
           </div>
 
-          {/* Cifra */}
+          {/* Cifra - no mesmo fluxo, sem container rolável próprio */}
           <div className="cifra-text" role="article" aria-label={`Cifra de ${cifra.musica}`}>
             {cifraLines.map((line, idx) => (
               <div key={idx} className="cifra-line">
@@ -186,7 +206,16 @@ const CifraDetalhe = ({ onDelete }) => {
 
           {/* Footer dentro do container */}
           <div className="cifra-footer">
-            <span className="views-label">👁 {views}</span>
+            <button
+              type="button"
+              onClick={toggleFavorite}
+              className="back-link"
+              aria-pressed={isFavorite}
+              aria-label={isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+            >
+              {isFavorite ? '★ Favorita' : '☆ Favoritar'}
+            </button>
+            <span className="views-label" aria-label={`Visualizações: ${views}`}>👁 {views}</span>
             <Link to="/home2" className="back-link">← Voltar para Home</Link>
           </div>
 

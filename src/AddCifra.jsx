@@ -22,6 +22,33 @@ function gerarSlug(musica, artista) {
     .toLowerCase();
 }
 
+// Normalização para fidelidade visual entre edição e leitura
+function normalizeCifra(input) {
+  if (typeof input !== 'string') return '';
+
+  let text = input;
+
+  // Remove BOM no início (caractere invisível)
+  if (text.charCodeAt(0) === 0xFEFF) {
+    text = text.slice(1);
+  }
+
+  // Remove zero-width spaces e similares
+  text = text.replace(/[\u200B\u200C\u200D\uFEFF]/g, '');
+
+  // Converte TABs para 2 espaços (evita largura imprevisível no iOS)
+  text = text.replace(/\t/g, '  ');
+
+  // Normaliza quebras de linha para LF (\n)
+  text = text.replace(/\r\n?/g, '\n');
+
+  // Opcional: remove espaços à direita de cada linha (trailing spaces)
+  // Descomente se quiser limpeza estética:
+  // text = text.split('\n').map(line => line.trimEnd()).join('\n');
+
+  return text;
+}
+
 export default function AddCifra({ setCifras, cifras }) {
   const { user, isMaster } = useAuth();
   const navigate = useNavigate();
@@ -86,7 +113,10 @@ export default function AddCifra({ setCifras, cifras }) {
     }
 
     setLoading(true);
-    const slug = gerarSlug(musica, artista); // Gerando slug
+    const slug = gerarSlug(musica, artista);
+    
+    // Normaliza a cifra antes de salvar (garante fidelidade no iPhone)
+    const normalizedCifra = normalizeCifra(cifra);
 
     if (isEditMode) {
       try {
@@ -94,14 +124,16 @@ export default function AddCifra({ setCifras, cifras }) {
         await updateDoc(docRef, {
           musica,
           artista,
-          cifra,
+          cifra: normalizedCifra, // salva normalizado
           genero,
-          slug, // adicionando slug
+          slug,
           updatedAt: serverTimestamp(),
         });
 
         const cifrasAtualizadas = cifras.map(c =>
-          c.id === (id || location.state.cifra.id) ? { ...c, musica, artista, cifra, genero, slug } : c
+          c.id === (id || location.state.cifra.id) 
+            ? { ...c, musica, artista, cifra: normalizedCifra, genero, slug } 
+            : c
         );
         setCifras(cifrasAtualizadas);
         setMessage('Cifra atualizada com sucesso!');
@@ -116,9 +148,9 @@ export default function AddCifra({ setCifras, cifras }) {
         const novaCifra = {
           musica,
           artista,
-          cifra,
+          cifra: normalizedCifra, // salva normalizado
           genero,
-          slug, // adicionando slug
+          slug,
           userId: user.uid,
           views: 0,
           createdAt: serverTimestamp(),
@@ -175,7 +207,18 @@ export default function AddCifra({ setCifras, cifras }) {
             onChange={(e) => setCifra(e.target.value)}
             rows={15}
             disabled={loading}
-            style={{ width: '100%', padding: '1rem', fontSize: '1.2rem', fontFamily: 'Courier New, monospace', borderRadius: '6px', border: '1px solid #ccc', marginTop: '0.3rem', resize: 'vertical' }}
+            style={{ 
+              width: '100%', 
+              padding: '1rem', 
+              fontSize: '1.2rem', 
+              fontFamily: 'Courier New, monospace', 
+              borderRadius: '6px', 
+              border: '1px solid #ccc', 
+              marginTop: '0.3rem', 
+              resize: 'vertical',
+              tabSize: 2, // consistente com a normalização
+              whiteSpace: 'pre-wrap' // permite quebra se necessário
+            }}
           />
         </div>
 
