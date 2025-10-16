@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 // ===================
 // Componentes
@@ -26,6 +26,52 @@ import { AuthProvider } from './contexts/AuthContext';
 import { db, doc, deleteDoc, collection, getDocs } from './firebase';
 
 import './App.css';
+
+// Util de slug (mantemos aqui para evitar import circular; depois podemos movê-lo para src/utils/slugify)
+function slugify(input = '') {
+  return input
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/&/g, ' e ')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+// Componente que recebe um ID antigo e redireciona para a URL bonita /cifras/:artistSlug/:musicSlug
+function LegacyByIdRedirect({ cifras }) {
+  const { slugOrId } = useParams();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Se já veio no formato slug/slug, evita loop e manda para a rota correta
+    if (slugOrId && slugOrId.includes('-')) {
+      // Ex.: alguém acessou /cifras/detalhe/bruno-e-marrone-fruto-especial (formato antigo improvisado)
+      // Tentamos partir em duas partes (artista + música) se possível – fallback abaixo.
+      const parts = slugOrId.split('-');
+      if (parts.length > 1) {
+        // fallback simples: deixa o usuário na home para evitar loop
+        navigate('/', { replace: true });
+        return;
+      }
+    }
+
+    // Tenta localizar a cifra por ID na lista carregada
+    const found = cifras.find(c => c.id === slugOrId);
+    if (found) {
+      const artistSlug = slugify(found.artista || found.artistName);
+      const musicSlug = slugify(found.musica || found.titulo || found.title);
+      navigate(`/cifras/${artistSlug}/${musicSlug}`, { replace: true });
+    } else {
+      // Caso a lista ainda não tenha sido carregada, ou não encontrou, mandamos para home ou 404
+      navigate('/', { replace: true });
+    }
+  }, [slugOrId, cifras, navigate]);
+
+  return null;
+}
 
 function AppContent() {
   const location = useLocation();
@@ -64,7 +110,7 @@ function AppContent() {
   async function handleDelete(id) {
     try {
       await deleteDoc(doc(db, 'cifras', id));
-      setCifras(cifras.filter(cifra => cifra.id !== id));
+      setCifras(prev => prev.filter(cifra => cifra.id !== id));
     } catch (error) {
       console.error('Erro ao deletar cifra:', error);
       alert('Erro ao deletar cifra. Veja o console.');
@@ -82,7 +128,8 @@ function AppContent() {
   // -----------------------
   // Controle de exibição do Header
   // -----------------------
-  const showHeader = location.pathname.startsWith('/cifras/detalhe/');
+  // Cobrir tanto rota antiga quanto nova
+  const showHeader = location.pathname.startsWith('/cifras/');
 
   return (
     <>
@@ -93,10 +140,16 @@ function AppContent() {
         <Route path="/" element={<Home2 />} />
         <Route path="/home2" element={<Home2 />} />
 
-        {/* Detalhe de cifra com /detalhe/:id */}
+        {/* Rota NOVA "bonita": /cifras/:artistSlug/:musicSlug */}
+        <Route
+          path="/cifras/:artistSlug/:musicSlug"
+          element={<CifraDetalhe cifras={cifras} onDelete={handleDelete} />}
+        />
+
+        {/* Rota ANTIGA por ID → redireciona para a rota bonita */}
         <Route
           path="/cifras/detalhe/:slugOrId"
-          element={<CifraDetalhe cifras={cifras} onDelete={handleDelete} />}
+          element={<LegacyByIdRedirect cifras={cifras} />}
         />
 
         {/* Adicionar nova cifra */}

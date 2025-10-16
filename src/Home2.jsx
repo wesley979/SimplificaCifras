@@ -5,13 +5,17 @@ import { db } from './firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import './Home2.css';
 
-// Função para gerar slug a partir do nome da música
-function gerarSlug(musica, artista) {
-  return (
-    musica?.toLowerCase().replace(/[^a-z0-9]+/g, '-') +
-    '-' +
-    (artista?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || '')
-  ).replace(/^-+|-+$/g, '');
+// ✅ Helper centralizado para gerar o path da cifra
+function getCifraPath(cifra) {
+  // Se houver slug no formato "musica/artista", inverte para "/cifras/artista/musica"
+  if (cifra.slug && cifra.slug.includes('/')) {
+    const [musicSlug, artistSlug] = cifra.slug.split('/');
+    if (musicSlug && artistSlug) {
+      return `/cifras/${artistSlug}/${musicSlug}`;
+    }
+  }
+  // Fallback: se não houver slug válido, usa a rota antiga por ID
+  return `/cifras/detalhe/${cifra.id}`;
 }
 
 export default function Home2() {
@@ -80,8 +84,9 @@ export default function Home2() {
     window.location.href = '/home2'; // força refresh da página inteira
   };
 
-  const handleClickSong = (id) => {
-    navigate(`/cifras/detalhe/${id}`);
+  // ✅ Atualizado para usar o helper getCifraPath
+  const handleClickSong = (cifra) => {
+    navigate(getCifraPath(cifra));
   };
 
   const handleClickGenre = (genre) => {
@@ -188,7 +193,7 @@ export default function Home2() {
               <div
                 key={song.id}
                 className="song-card"
-                onClick={() => handleClickSong(song.id)}
+                onClick={() => handleClickSong(song)}
               >
                 <h4>{song.musica}</h4>
                 <p>{song.artista}</p>
@@ -207,7 +212,7 @@ export default function Home2() {
               <div
                 key={song.id}
                 className="song-card"
-                onClick={() => handleClickSong(song.id)}
+                onClick={() => handleClickSong(song)}
               >
                 <h4>{song.musica}</h4>
                 <p>{song.artista}</p>
