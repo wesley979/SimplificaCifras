@@ -9,8 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "generate-sitemap": "node scripts/generateSitemap.cjs",
-
-    "fix:sitemap": "powershell -Command \"(Get-Content .\\public\\sitemap.xml) -replace 'https://simplificacifras.com.br','https://www.simplificacifras.com.br' | Set-Content .\\public\\sitemap.xml\"",
+    "fix:sitemap": "node scripts/fixSitemap.cjs",
     "postbuild": "npm run fix:sitemap"
   },
   "dependencies": {
@@ -32,4 +31,3 @@
     "vite": "^7.1.0"
   }
 }
-
