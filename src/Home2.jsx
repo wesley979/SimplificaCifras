@@ -28,9 +28,9 @@ export default function Home2() {
   const [latestSongs, setLatestSongs] = useState([]);
 
   const [stats, setStats] = useState([
-    { title: 'Cifras Disponíveis', value: '12.847', desc: 'E crescendo todos os dias' },
-    { title: 'Usuários Ativos', value: '89.234', desc: 'Músicos de todo o Brasil' },
-    { title: 'Cifras Tocadas', value: '2.1M', desc: 'No último mês' },
+    { title: 'Cifras Disponíveis', value: '58', desc: 'E crescendo todos os dias' },
+    { title: 'Usuários Ativos', value: '1600', desc: 'Músicos de todo o Brasil' },
+    { title: 'Cifras Tocadas', value: '1000', desc: 'No último mês' },
   ]);
 
   const masterEmails = ['lais@gmail.com'];
