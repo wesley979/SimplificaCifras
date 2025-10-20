@@ -8,7 +8,10 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "generate-sitemap": "node scripts/generateSitemap.cjs"
+    "generate-sitemap": "node scripts/generateSitemap.cjs",
+
+    "fix:sitemap": "powershell -Command \"(Get-Content .\\public\\sitemap.xml) -replace 'https://simplificacifras.com.br','https://www.simplificacifras.com.br' | Set-Content .\\public\\sitemap.xml\"",
+    "postbuild": "npm run fix:sitemap"
   },
   "dependencies": {
     "firebase": "^12.1.0",
@@ -29,3 +32,4 @@
     "vite": "^7.1.0"
   }
 }
+
