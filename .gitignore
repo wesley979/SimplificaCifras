@@ -29,3 +29,7 @@ dist-ssr
 # Arquivos sensíveis
 firebase.js
 .env 
+
+# Credenciais e chaves do Google Cloud
+scripts/serviceAccountKey.json.json
+
