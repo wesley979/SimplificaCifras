@@ -18,6 +18,80 @@ function getCifraPath(cifra) {
   return `/cifras/detalhe/${cifra.id}`;
 }
 
+// ✅ Rodapé com paleta preto/roxo e CSS inline
+function Footer() {
+  const linkStyle = {
+    color: '#C6B6FF',           // roxo claro para boa leitura no fundo escuro
+    textDecoration: 'none',
+    padding: '6px 10px',
+    borderRadius: 6,
+    transition: 'all .2s ease',
+  };
+  const linkHover = { background: '#2b2447' }; // roxo bem escuro no hover
+
+  return (
+    <footer
+      style={{
+        marginTop: 48,
+        padding: '24px 16px',
+        background: 'linear-gradient(180deg, #0f0d17 0%, #141024 100%)', // preto/roxo escuro
+        borderTop: '1px solid #221b3a',
+        color: '#e8e6ff',
+      }}
+    >
+      <nav
+        aria-label="Links institucionais"
+        style={{
+          display: 'flex',
+          gap: 16,
+          justifyContent: 'center',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          fontSize: 14,
+        }}
+      >
+        <Link
+          to="/privacidade"
+          style={linkStyle}
+          onMouseEnter={e => Object.assign(e.currentTarget.style, linkHover)}
+          onMouseLeave={e => Object.assign(e.currentTarget.style, linkStyle)}
+        >
+          Política de Privacidade
+        </Link>
+        <span aria-hidden="true" style={{ color: '#6d5fb6' }}>|</span>
+        <Link
+          to="/termos"
+          style={linkStyle}
+          onMouseEnter={e => Object.assign(e.currentTarget.style, linkHover)}
+          onMouseLeave={e => Object.assign(e.currentTarget.style, linkStyle)}
+        >
+          Termos de Uso
+        </Link>
+        <span aria-hidden="true" style={{ color: '#6d5fb6' }}>|</span>
+        <Link
+          to="/contato"
+          style={linkStyle}
+          onMouseEnter={e => Object.assign(e.currentTarget.style, linkHover)}
+          onMouseLeave={e => Object.assign(e.currentTarget.style, linkStyle)}
+        >
+          Contato
+        </Link>
+      </nav>
+
+      <div
+        style={{
+          marginTop: 10,
+          textAlign: 'center',
+          color: '#a89de0',
+          fontSize: 12,
+        }}
+      >
+        © {new Date().getFullYear()} Simplifica Cifras · Todos os direitos reservados
+      </div>
+    </footer>
+  );
+}
+
 export default function Home2() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -251,6 +325,9 @@ export default function Home2() {
           </div>
         ))}
       </section>
+
+      {/* ✅ Rodapé novo, sem mexer no restante da página */}
+      <Footer />
     </div>
   );
 }

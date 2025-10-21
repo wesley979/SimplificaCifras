@@ -15,6 +15,11 @@ import Favoritos from './Favoritos';
 import Home2 from './Home2';
 import CifraGenero from './CifraGenero';
 
+// Novas páginas institucionais
+import Privacidade from './Privacidade.jsx';
+import Termos from './Termos.jsx';
+import Contato from './Contato.jsx';
+
 // ===================
 // Contexto de autenticação
 // ===================
@@ -48,11 +53,8 @@ function LegacyByIdRedirect({ cifras }) {
   useEffect(() => {
     // Se já veio no formato slug/slug, evita loop e manda para a rota correta
     if (slugOrId && slugOrId.includes('-')) {
-      // Ex.: alguém acessou /cifras/detalhe/bruno-e-marrone-fruto-especial (formato antigo improvisado)
-      // Tentamos partir em duas partes (artista + música) se possível – fallback abaixo.
       const parts = slugOrId.split('-');
       if (parts.length > 1) {
-        // fallback simples: deixa o usuário na home para evitar loop
         navigate('/', { replace: true });
         return;
       }
@@ -65,7 +67,6 @@ function LegacyByIdRedirect({ cifras }) {
       const musicSlug = slugify(found.musica || found.titulo || found.title);
       navigate(`/cifras/${artistSlug}/${musicSlug}`, { replace: true });
     } else {
-      // Caso a lista ainda não tenha sido carregada, ou não encontrou, mandamos para home ou 404
       navigate('/', { replace: true });
     }
   }, [slugOrId, cifras, navigate]);
@@ -165,10 +166,7 @@ function AppContent() {
         />
 
         {/* Favoritos */}
-        <Route
-          path="/favoritos"
-          element={<Favoritos />}
-        />
+        <Route path="/favoritos" element={<Favoritos />} />
 
         {/* Login e Registro */}
         <Route path="/login" element={<Login />} />
@@ -176,6 +174,11 @@ function AppContent() {
 
         {/* Página de gênero */}
         <Route path="/genero/:genero" element={<CifraGenero />} />
+
+        {/* Páginas institucionais */}
+        <Route path="/privacidade" element={<Privacidade />} />
+        <Route path="/termos" element={<Termos />} />
+        <Route path="/contato" element={<Contato />} />
       </Routes>
     </>
   );
